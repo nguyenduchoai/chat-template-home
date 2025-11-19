@@ -14,12 +14,12 @@ const FALLBACK_SITE_INFO = {
 export async function GET() {
     try {
         const siteInfo = await getSiteInfoRecord()
-        return NextResponse.json(siteInfo ?? FALLBACK_SITE_INFO)
+        if (!siteInfo) {
+            return NextResponse.json(FALLBACK_SITE_INFO)
+        }
+        return NextResponse.json(siteInfo)
     } catch (error) {
         console.error("Error fetching site info:", error)
-        return NextResponse.json(
-            { error: "Failed to fetch site info" },
-            { status: 500 }
-        )
+        return NextResponse.json(FALLBACK_SITE_INFO)
     }
 }

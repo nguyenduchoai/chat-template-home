@@ -57,7 +57,6 @@ export async function requireAuth(): Promise<User> {
 export async function requireAdmin(): Promise<User> {
     const user = await requireAuth()
     if (user.role !== 'admin' && user.role !== 'superadmin') {
-        console.log(user, 'user')
         throw new Error('Forbidden')
     }
     return user

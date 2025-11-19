@@ -88,6 +88,7 @@ export async function getUserByEmail(email: string): Promise<User | null> {
             .eq('email', email)
             .single()
 
+        console.log('Get user by email data:', data, 'error:', error)
         if (error || !data) return null
         return data as User
     } catch (error) {
@@ -229,7 +230,7 @@ export async function getAllPosts(): Promise<Post[]> {
             .from('Post')
             .select('id, title, slug, excerpt, coverImage, published, publishedAt, createdAt')
             .order('createdAt', { ascending: false })
-
+        console.log('Get all posts data:', data, 'error:', error)
         if (error || !data) return []
         return data.map((post: any) => ({
             ...post,
@@ -346,7 +347,7 @@ export async function updatePost(id: string, postData: Partial<Post>): Promise<P
             .eq('id', id)
             .select()
             .single()
-        console.log('Update post data:', data, 'error:', error)
+
         if (error || !data) return null
         return {
             ...data,

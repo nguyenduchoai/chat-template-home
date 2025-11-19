@@ -154,7 +154,6 @@ NEXT_PUBLIC_BIZINO_BOT_UUID=your-bot-uuid-here
 **Lưu ý bảo mật**:
 - ⚠️ Không commit file `.env.local` vào Git
 - ⚠️ `SUPABASE_SERVICE_ROLE_KEY` chỉ dùng server-side
-- ⚠️ `NEXTAUTH_SECRET` phải khác nhau giữa dev và production
 
 ### Bước 4: Setup Database
 
@@ -465,41 +464,6 @@ Set tất cả biến cho cả 3 environments, có thể dùng giá trị khác 
 3. **Update Environment Variable**:
    - `NEXT_PUBLIC_BASE_URL=https://yourdomain.com`
    - Redeploy để apply
-
-### Bước 7: Vercel Configuration (Advanced)
-
-Tạo file `vercel.json` trong thư mục `client/`:
-
-```json
-{
-  "buildCommand": "npm run build",
-  "devCommand": "npm run dev",
-  "installCommand": "npm install",
-  "framework": "nextjs",
-  "regions": ["sin1"],
-  "env": {
-    "NEXT_PUBLIC_BASE_URL": "https://your-domain.vercel.app"
-  },
-  "headers": [
-    {
-      "source": "/(.*)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "no-store, max-age=0"
-        }
-      ]
-    }
-  ],
-  "redirects": [
-    {
-      "source": "/admin",
-      "destination": "/admin/dashboard",
-      "permanent": false
-    }
-  ]
-}
-```
 
 ### Deploy Checklist
 
