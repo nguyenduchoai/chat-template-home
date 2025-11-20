@@ -21,9 +21,8 @@ export default function ContactPage() {
     const socials = socialConfigs.filter(({ key }) => siteInfo[key])
 
     return (
-        <div className="min-h-screen pt-16 pb-12">
+        <div className="pt-16 pb-12">
             <div className="container mx-auto px-4">
-                {/* Hero Section */}
                 <div className="text-center mb-12 pt-8">
                     <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900 mb-4">
                         Liên hệ với chúng tôi

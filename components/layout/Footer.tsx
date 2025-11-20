@@ -1,109 +1,55 @@
 "use client"
 
-import type { ElementType } from "react"
 import Link from "next/link"
-import { useSiteInfo } from "@/components/providers/SiteInfoProvider"
-import { Facebook, Instagram, Linkedin, Twitter, Youtube, Music2 } from "lucide-react"
-import Image from "next/image"
 import { usePathname } from "next/navigation"
+import { Button } from "@/components/ui/button"
+import { MessageSquare, Send } from "lucide-react"
+import { useState, useEffect, useRef } from "react"
 
-const navLinks = [
-    { href: "/bai-viet", label: "Bài viết" },
-    { href: "/tro-chuyen", label: "Trò chuyện" },
-    { href: "/admin", label: "Quản trị" },
-]
-
-type SocialKey = "facebook" | "instagram" | "twitter" | "linkedin" | "youtube" | "tiktok"
-
-const socialConfigs: Array<{ key: SocialKey; label: string; icon: ElementType }> = [
-    { key: "facebook", label: "Facebook", icon: Facebook },
-    { key: "instagram", label: "Instagram", icon: Instagram },
-    { key: "twitter", label: "Twitter", icon: Twitter },
-    { key: "linkedin", label: "LinkedIn", icon: Linkedin },
-    { key: "youtube", label: "YouTube", icon: Youtube },
-    { key: "tiktok", label: "TikTok", icon: Music2 },
-]
-
-export default function Footer() {
-    const siteInfo = useSiteInfo()
+export default function ChatBar() {
+    const [query, setQuery] = useState("")
     const pathname = usePathname()
 
-    const socials = socialConfigs.filter(({ key }) => siteInfo[key])
-
-    if (pathname?.startsWith("/admin") || pathname?.startsWith("/tro-chuyen")) {
+    // Ẩn ở trang tro-chuyen và các trang admin
+    if (pathname?.startsWith("/tro-chuyen") || pathname?.startsWith("/admin")) {
         return null
     }
 
     return (
-        <footer className="bg-gradient-to-b from-white via-blue-50/40 to-blue-50 border-t border-slate-100 mt-12 text-slate-900">
-            <div className="container px-4 py-10 grid gap-10 md:grid-cols-3 mx-auto">
-                <div className="space-y-4">
-                    <Link href="/" className="flex items-center space-x-3">
-                        {siteInfo.logo ? (
-                            <span className="relative h-10 w-10 overflow-hidden rounded-full border border-border">
-                                <img src={siteInfo.logo} alt={siteInfo.title} className="object-cover" />
-                            </span>
-                        ) : null}
-                        <div className="flex-1">
-                            <p className="text-lg font-semibold text-slate-900">{siteInfo.name ?? siteInfo.title}</p>
-                            <p className="text-sm text-slate-500">{siteInfo.description}</p>
-                        </div>
-                    </Link>
-                    {socials.length > 0 && (
-                        <div className="flex items-center gap-3 flex-wrap">
-                            {socials.map(({ key, label, icon: Icon }) => (
-                                <Link
-                                    key={key}
-                                    href={siteInfo[key as SocialKey] as string}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    aria-label={label}
-                                    className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 text-slate-500 hover:text-blue-600 transition-colors bg-white"
-                                >
-                                    <Icon className="h-4 w-4" />
-                                </Link>
-                            ))}
-                        </div>
-                    )}
-                </div>
 
-                <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.25em] text-slate-500 mb-4">Điều hướng</p>
-                    <ul className="space-y-2">
-                        {navLinks.map((link) => (
-                            <li key={link.href}>
-                                <Link href={link.href} className="text-sm font-medium text-slate-700 hover:text-blue-600 transition-colors">
-                                    {link.label}
-                                </Link>
-                            </li>
-                        ))}
-                    </ul>
+        <div>
+            <div className="h-32" />
+            <section className="bg-gradient-to-b fixed bottom-0 left-0 right-0 from-transparent to-blue-50 w-full py-8 px-4">
+                <div className="container mx-auto">
+                    <div className="flex flex-col gap-2 sm:gap-3 md:flex-row md:items-center p-3 sm:p-4 border rounded-xl sm:rounded-2xl bg-white">
+                        <div className="flex items-center gap-2 flex-1 w-full min-w-0">
+                            <MessageSquare className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground flex-shrink-0" />
+                            <input
+                                type="text"
+                                placeholder="Hỏi bất cứ điều gì về AI..."
+                                value={query}
+                                onChange={(e) => setQuery(e.target.value)}
+                                onKeyDown={(e) => {
+                                    if (e.key === "Enter" && query.trim()) {
+                                        window.location.href = `/tro-chuyen?q=${encodeURIComponent(query)}`
+                                    }
+                                }}
+                                className="flex-1 outline-none bg-transparent text-foreground placeholder:text-muted-foreground text-sm sm:text-base md:text-lg min-w-0"
+                            />
+                        </div>
+                        <Link
+                            href={`/tro-chuyen${query ? `?q=${encodeURIComponent(query)}` : ""}`}
+                            className="w-full md:w-auto flex-shrink-0"
+                        >
+                            <Button size="lg" className="w-full md:w-auto gap-2 text-sm sm:text-base">
+                                <Send className="h-3 w-3 sm:h-4 sm:w-4" />
+                                Trò chuyện
+                            </Button>
+                        </Link>
+                    </div>
                 </div>
-
-                <div className="space-y-2">
-                    <p className="text-xs font-semibold uppercase tracking-[0.25em] text-slate-500">Liên hệ</p>
-                    {siteInfo.address && <p className="text-sm text-slate-700">{siteInfo.address}</p>}
-                    {siteInfo.contact && <p className="text-sm text-slate-700">{siteInfo.contact}</p>}
-                    {siteInfo.email && (
-                        <p className="text-sm text-slate-700">
-                            <span className="font-semibold text-slate-900">Email: </span>
-                            {siteInfo.email}
-                        </p>
-                    )}
-                    {siteInfo.phone && (
-                        <p className="text-sm text-slate-700">
-                            <span className="font-semibold text-slate-900">SĐT: </span>
-                            {siteInfo.phone}
-                        </p>
-                    )}
-                </div>
-            </div>
-            <div className="border-t">
-                <div className="p-4 text-center text-xs text-slate-500">
-                    {`© ${new Date().getFullYear()} ${siteInfo.author}`}
-                </div>
-            </div>
-        </footer>
+            </section>
+        </div>
     )
 }
 

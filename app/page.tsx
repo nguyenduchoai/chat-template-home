@@ -1,5 +1,4 @@
 import Banner from "@/components/Banner"
-import ChatBar from "@/components/ChatBar"
 import PostCard from "@/components/PostCard"
 import SlideShow from "@/components/SlideShow"
 import FeaturesSection from "@/components/FeaturesSection"
@@ -59,11 +58,6 @@ export default async function Home() {
           )}
         </div>
       </section>
-      <div
-        className="pb-32"
-      />
-      <ChatBar />
-
     </main>
   )
 }
