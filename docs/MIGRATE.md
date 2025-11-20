@@ -8,10 +8,15 @@
 3. Vào **SQL Editor** (menu bên trái)
 
 ### Bước 2: Copy và chạy SQL
-1. Mở file `supabase/migrations/001_initial_schema.sql`
-2. Copy toàn bộ nội dung
-3. Paste vào SQL Editor trong Supabase Dashboard
-4. Click **Run** hoặc nhấn `Ctrl+Enter` (Windows) / `Cmd+Enter` (Mac)
+Chạy tuần tự các file SQL sau (copy nội dung từng file vào SQL Editor rồi bấm Run):
+
+1. `supabase/migrations/001_create_user_table.sql`
+2. `supabase/migrations/002_create_post_table.sql`
+3. `supabase/migrations/002_create_slides_table.sql`
+4. `supabase/migrations/003_create_siteinfo_table.sql`
+5. `supabase/migrations/006_add_features_sections.sql`
+6. `supabase/migrations/007_seed_features_reasons.sql`
+7. `supabase/migrations/008_backfill_siteinfo_section_titles.sql`
 
 ### Bước 3: Verify
 1. Vào **Table Editor** trong Supabase Dashboard

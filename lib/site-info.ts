@@ -1,4 +1,3 @@
-import http from "@/lib/http"
 import { getSiteInfoRecord } from "./db"
 
 const FALLBACK_SITE_INFO = {
@@ -35,6 +34,10 @@ export interface SiteInfo {
   ogImage?: string
   ogType?: string
   twitterCard?: string
+  featuresTitle?: string
+  featuresDescription?: string
+  reasonsTitle?: string
+  reasonsDescription?: string
 }
 
 // Server-side: Get from database
@@ -54,7 +57,9 @@ export async function getSiteInfo(): Promise<SiteInfo> {
 // Client-side: Get from API
 export async function getSiteInfoClient(): Promise<SiteInfo> {
   try {
-    const { data } = await http.get<SiteInfo>("/api/public/site-info")
+    const response = await fetch("/api/public/site-info")
+    if (!response.ok) throw new Error('Failed to fetch')
+    const data = await response.json()
     return data
   } catch (error) {
     console.warn('Failed to fetch site info from API, using fallback:', error)

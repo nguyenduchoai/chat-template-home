@@ -5,12 +5,12 @@ import type { Post } from "@/lib/db"
 import { format } from "date-fns"
 import { vi } from "date-fns/locale"
 import { getImageUrl, transformHtmlImageUrls } from "@/lib/image-utils"
-import http from "@/lib/http"
 
 async function fetchPost(slug: string): Promise<Post | null> {
     try {
-        console.log(`/api/public/posts/${slug}`)
-        const { data } = await http.get(`/api/public/posts/${slug}`, { params: { cache: "no-store" } })
+        const response = await fetch(`/api/public/posts/${slug}`, { cache: "no-store" })
+        if (!response.ok) return null
+        const data = await response.json()
         return {
             ...data,
             publishedAt: data.publishedAt ? new Date(data.publishedAt) : null,

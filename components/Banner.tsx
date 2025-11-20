@@ -11,7 +11,7 @@ export default function Banner() {
         return null
     }
     return (
-        <section className="relative w-full py-20 md:py-32 bg-gradient-to-br from-primary/10 via-background to-background flex justify-center">
+        <section className="relative w-full py-16 md:py-24 bg-gradient-to-b from-white to-blue-50 flex justify-center">
             <div className="container px-4 md:px-6">
                 <div className="flex flex-col items-center space-y-4 text-center">
                     <div className="space-y-2">

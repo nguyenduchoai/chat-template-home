@@ -11,7 +11,7 @@ import { Plus, Edit, Trash2 } from "lucide-react"
 import { format } from "date-fns"
 import { vi } from "date-fns/locale"
 import { getImageUrl } from "@/lib/image-utils"
-import { Spinner } from "@/components/ui/spinner"
+import { Skeleton } from "@/components/ui/skeleton"
 
 interface Post {
     id: string
@@ -23,6 +23,23 @@ interface Post {
     publishedAt: Date | null
     createdAt: Date
 }
+
+const PostSkeletonCard = () => (
+    <Card className="overflow-hidden animate-pulse">
+        <div className="w-full h-40 bg-muted" />
+        <CardHeader>
+            <div className="space-y-3">
+                <Skeleton className="h-5 w-3/4" />
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-1/2" />
+            </div>
+        </CardHeader>
+        <div className="px-6 pb-6 flex gap-2">
+            <Skeleton className="h-9 flex-1" />
+            <Skeleton className="h-9 w-24" />
+        </div>
+    </Card>
+)
 
 export default function AdminPostsPage() {
     // Auth is already checked in admin layout
@@ -96,16 +113,17 @@ export default function AdminPostsPage() {
                 </Link>
             </div>
 
-            {
-                loading ?
-                    <div className="flex justify-center items-center h-full">
-                        <Spinner />
-                    </div>
-                    :
-                    <>
-                        {posts.length > 0 ? (
-                            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                                {posts.map((post) => (
+            {loading ? (
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    {Array.from({ length: 4 }).map((_, index) => (
+                        <PostSkeletonCard key={`post-skeleton-${index}`} />
+                    ))}
+                </div>
+            ) : (
+                <>
+                    {posts.length > 0 ? (
+                        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                            {posts.map((post) => (
                                     <Card key={post.id} className="overflow-hidden hover:shadow-lg transition-shadow">
                                         {post.coverImage && (
                                             <div className="relative w-full h-48 overflow-hidden">
@@ -157,18 +175,18 @@ export default function AdminPostsPage() {
                                             </Button>
                                         </div>
                                     </Card>
-                                ))}
-                            </div>
-                        ) : (
-                            <div className="text-center py-12">
-                                <p className="text-muted-foreground mb-4">Chưa có bài viết nào</p>
-                                <Link href="/admin/posts/new">
-                                    <Button>Tạo bài viết đầu tiên</Button>
-                                </Link>
-                            </div>
-                        )}
-                    </>
-            }
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="text-center py-12">
+                            <p className="text-muted-foreground mb-4">Chưa có bài viết nào</p>
+                            <Link href="/admin/posts/new">
+                                <Button>Tạo bài viết đầu tiên</Button>
+                            </Link>
+                        </div>
+                    )}
+                </>
+            )}
 
             <ConfirmDialog
                 open={confirmDeleteId !== null}

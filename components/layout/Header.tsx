@@ -35,7 +35,7 @@ export default function Header() {
                             <Image src={siteInfo.logo} alt={siteInfo.title} fill className="object-cover" priority />
                         </span>
                     ) : null}
-                    <span className="text-lg font-semibold sm:text-xl">{siteInfo.name}</span>
+                    <span className="hidden sm:block text-lg font-semibold sm:text-xl">{siteInfo.name}</span>
                 </Link>
 
                 <nav className="flex items-center gap-2">

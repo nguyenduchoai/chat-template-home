@@ -228,7 +228,7 @@ const ChatContainer = () => {
             </Head>
             <div className="flex flex-1 flex-col w-full scroll-hidden lg:px-[calc((100vw_-_310px)*0.3/2)]">
                 {chatHistory?.length > 0 ? (
-                    <ScrollToBottom className="h-0 flex-1 overflow-auto scroll-hidden p-2 min-h-0 pt-[32px] pb-[84px]">
+                    <ScrollToBottom className="h-0 flex-1 overflow-auto scroll-hidden p-2 min-h-0 pt-18 pb-[84px]">
                         <div className='pb-[80px]'>
                             {chatHistory.map((message: any, index: number) => (
                                 message.sender === 'user' ? (
@@ -242,7 +242,7 @@ const ChatContainer = () => {
                                         </div>
                                     </div>
                                 ) : (
-                                    <div className="text-token-text-primary mb-3 w-full border-0 bg-transparent dark:border-0 dark:bg-transparent" key={index}>
+                                    <div className="mb-3 w-full border-0 bg-transparent" key={index}>
                                         <div className="pb-[4px] pt-[12px] flex gap-x-[12px] px-[16px] lg:mb-[10px] lg:gap-x-[16px]">
                                             <div className="conversation-header flex-start">
                                                 <img src={botInfo?.setting?.logo_url || "/icons/logo.png"} width={32} height={32} alt="Logo" />

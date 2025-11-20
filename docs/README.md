@@ -119,41 +119,24 @@ Hoặc tạo file `.env.local` với nội dung:
 # Supabase Configuration
 NEXT_PUBLIC_SUPABASE_URL=https://xxxxx.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 
-# NextAuth Configuration (if using NextAuth)
-NEXTAUTH_URL=http://localhost:3000
-NEXTAUTH_SECRET=your-local-secret-key-min-32-chars
-
-# Application URLs
-NEXT_PUBLIC_BASE_URL=http://localhost:3000
-NEXT_PUBLIC_API_URL=http://localhost:3000
-
-# Admin User Configuration (for init-admin script)
-ADMIN_EMAIL=admin@example.com
-ADMIN_PASSWORD=admin123456
+# Admin display name (dùng cho init-admin script)
 ADMIN_NAME=Administrator
 
 # Bizino AI Configuration (optional)
-NEXT_PUBLIC_BIZINO_API=https://saledemo.bizino.ai/api
+NEXT_PUBLIC_BIZINO_API=https://chat.bizino.ai/api
 NEXT_PUBLIC_BIZINO_BOT_UUID=your-bot-uuid-here
 ```
 
 **Giải thích các biến**:
 - `NEXT_PUBLIC_SUPABASE_URL`: URL của Supabase project
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Public anon key từ Supabase
-- `SUPABASE_SERVICE_ROLE_KEY`: Service role key (server-only, giữ bí mật)
-- `NEXTAUTH_URL`: Base URL cho NextAuth callbacks
-- `NEXTAUTH_SECRET`: Secret key cho NextAuth (generate bằng `openssl rand -base64 32`)
-- `NEXT_PUBLIC_BASE_URL`: URL gốc của ứng dụng
-- `NEXT_PUBLIC_API_URL`: API endpoint base URL
-- `ADMIN_EMAIL/PASSWORD/NAME`: Thông tin admin user mặc định
-- `NEXT_PUBLIC_BIZINO_API`: API endpoint của Bizino AI (nếu sử dụng)
-- `NEXT_PUBLIC_BIZINO_BOT_UUID`: Bot UUID từ Bizino (nếu sử dụng)
+- `ADMIN_NAME`: Tên hiển thị mặc định cho admin khi chạy script khởi tạo
+- `NEXT_PUBLIC_BIZINO_API`: Endpoint Bizino AI (nếu dùng chatbot Bizino)
+- `NEXT_PUBLIC_BIZINO_BOT_UUID`: Bot UUID từ Bizino (tuỳ chọn)
 
 **Lưu ý bảo mật**:
 - ⚠️ Không commit file `.env.local` vào Git
-- ⚠️ `SUPABASE_SERVICE_ROLE_KEY` chỉ dùng server-side
 
 ### Bước 4: Setup Database
 
@@ -338,23 +321,12 @@ Trong Vercel Dashboard, vào `Settings` → `Environment Variables`, thêm:
 # Supabase Configuration
 NEXT_PUBLIC_SUPABASE_URL=https://xxxxx.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 
-# NextAuth Configuration
-NEXTAUTH_URL=https://your-domain.vercel.app
-NEXTAUTH_SECRET=production-secret-key-min-32-chars-secure
-
-# Application URLs
-NEXT_PUBLIC_BASE_URL=https://your-domain.vercel.app
-NEXT_PUBLIC_API_URL=https://your-domain.vercel.app
-
-# Admin User Configuration
-ADMIN_EMAIL=admin@yourdomain.com
-ADMIN_PASSWORD=SecurePassword123!
+# Admin display name
 ADMIN_NAME=Administrator
 
 # Bizino AI Configuration (optional)
-NEXT_PUBLIC_BIZINO_API=https://saledemo.bizino.ai/api
+NEXT_PUBLIC_BIZINO_API=https://chat.bizino.ai/api
 NEXT_PUBLIC_BIZINO_BOT_UUID=your-production-bot-uuid
 ```
 
@@ -364,25 +336,11 @@ NEXT_PUBLIC_BIZINO_BOT_UUID=your-production-bot-uuid
    - Copy từ Supabase Dashboard → Settings → API
    - `NEXT_PUBLIC_SUPABASE_URL`: Project URL
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Project API keys → anon public
-   - `SUPABASE_SERVICE_ROLE_KEY`: Project API keys → service_role (⚠️ bí mật)
 
-2. **NextAuth Secret**:
-   ```bash
-   # Generate secure secret
-   openssl rand -base64 32
-   ```
-   Copy output vào `NEXTAUTH_SECRET`
+2. **ADMIN_NAME**:
+   - Tên hiển thị mặc định cho tài khoản admin khi chạy script `init-admin`
 
-3. **URLs**:
-   - Sau khi deploy lần đầu, Vercel cung cấp URL: `https://your-app.vercel.app`
-   - Update `NEXTAUTH_URL`, `NEXT_PUBLIC_BASE_URL`, `NEXT_PUBLIC_API_URL` với URL này
-   - Nếu có custom domain, dùng domain đó
-
-4. **Admin User**:
-   - Đặt email/password mạnh cho production
-   - Khác với credentials ở local development
-
-5. **Bizino AI** (Optional):
+3. **Bizino AI** (Optional):
    - Chỉ cần nếu sử dụng Bizino AI chatbot
    - Lấy `BOT_UUID` từ Bizino Dashboard
 
