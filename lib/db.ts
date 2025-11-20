@@ -1,5 +1,6 @@
 import { createSupabaseServerClient, createSupabaseScriptClient } from './supabase'
 import type { SupabaseClient } from '@supabase/supabase-js'
+import bcrypt from 'bcryptjs'
 
 async function getSupabaseClient(): Promise<SupabaseClient> {
     try {
@@ -49,6 +50,10 @@ export interface SiteInfo {
     keywords?: string | null
     bannerTitle?: string | null
     bannerDescription?: string | null
+    featuresTitle?: string | null
+    featuresDescription?: string | null
+    reasonsTitle?: string | null
+    reasonsDescription?: string | null
     author?: string | null
     email?: string | null
     phone?: string | null
@@ -78,6 +83,28 @@ export interface Slide {
     updatedAt: Date
 }
 
+export interface Feature {
+    id: string
+    icon: string
+    title: string
+    description: string
+    order: number
+    active: boolean
+    createdAt: Date
+    updatedAt: Date
+}
+
+export interface Reason {
+    id: string
+    icon: string
+    title: string
+    description: string
+    order: number
+    active: boolean
+    createdAt: Date
+    updatedAt: Date
+}
+
 // Users
 export async function getUserByEmail(email: string): Promise<User | null> {
     try {
@@ -88,7 +115,6 @@ export async function getUserByEmail(email: string): Promise<User | null> {
             .eq('email', email)
             .single()
 
-        console.log('Get user by email data:', data, 'error:', error)
         if (error || !data) return null
         return data as User
     } catch (error) {
@@ -123,12 +149,18 @@ export async function createUser(userData: {
 }): Promise<User> {
     const supabase = await getSupabaseClient()
 
+    // Hash password if provided
+    let hashedPassword = userData.password
+    if (hashedPassword && !hashedPassword.startsWith('$2a$')) {
+        hashedPassword = await bcrypt.hash(hashedPassword, 10)
+    }
+
     const { data, error } = await supabase
         .from('User')
         .insert({
             email: userData.email,
             name: userData.name || null,
-            password: userData.password || null,
+            password: hashedPassword || null,
             role: userData.role || 'user',
             image: userData.image || null,
         })
@@ -147,8 +179,6 @@ export async function createUser(userData: {
     }
 
     return data as User
-
-
 }
 
 
@@ -230,7 +260,7 @@ export async function getAllPosts(): Promise<Post[]> {
             .from('Post')
             .select('id, title, slug, excerpt, coverImage, published, publishedAt, createdAt')
             .order('createdAt', { ascending: false })
-        console.log('Get all posts data:', data, 'error:', error)
+
         if (error || !data) return []
         return data.map((post: any) => ({
             ...post,
@@ -436,6 +466,10 @@ const SITE_INFO_COLUMNS = `
     keywords,
     bannerTitle,
     bannerDescription,
+    featuresTitle,
+    featuresDescription,
+    reasonsTitle,
+    reasonsDescription,
     author,
     email,
     phone,
@@ -625,7 +659,6 @@ export async function createSlide(slide: {
             })
             .select(SLIDE_COLUMNS)
             .single()
-        console.log('Create slide data:', data, 'error:', error)
 
         if (error || !data) return null
         return mapSlide(data)
@@ -640,7 +673,6 @@ export async function updateSlide(
     slide: Partial<Omit<Slide, 'id' | 'createdAt' | 'updatedAt'>>
 ): Promise<Slide | null> {
     try {
-        console.log('Updating slide id:', id, 'with data:', slide)
         const supabase = await getSupabaseClient()
         const { data, error } = await supabase
             .from('Slides')
@@ -654,7 +686,6 @@ export async function updateSlide(
             .eq('id', id)
             .select(SLIDE_COLUMNS)
             .single()
-        console.log('Update slide data:', data, 'error:', error)
 
         if (error || !data) return null
         return mapSlide(data)
@@ -696,6 +727,336 @@ export async function reorderSlides(slideOrders: { id: string; order: number }[]
         return true
     } catch (error) {
         console.error('Error reordering slides:', error)
+        return false
+    }
+}
+
+// ============ FEATURES ============
+
+const FEATURE_COLUMNS = 'id, icon, title, description, "order", active, created_at, updated_at'
+
+function mapFeature(data: any): Feature {
+    return {
+        id: data.id,
+        icon: data.icon,
+        title: data.title,
+        description: data.description,
+        order: data.order,
+        active: data.active,
+        createdAt: new Date(data.created_at),
+        updatedAt: new Date(data.updated_at),
+    }
+}
+
+export async function getAllFeatures(): Promise<Feature[]> {
+    try {
+        const supabase = await getSupabaseClient()
+        const { data, error } = await supabase
+            .from('Features')
+            .select(FEATURE_COLUMNS)
+            .order('order', { ascending: true })
+
+        if (error || !data) return []
+        return data.map(mapFeature)
+    } catch (error) {
+        console.error('Error fetching features:', error)
+        return []
+    }
+}
+
+export async function getActiveFeatures(): Promise<Feature[]> {
+    try {
+        const supabase = await getSupabaseClient()
+        const { data, error } = await supabase
+            .from('Features')
+            .select(FEATURE_COLUMNS)
+            .eq('active', true)
+            .order('order', { ascending: true })
+
+        if (error || !data) return []
+        return data.map(mapFeature)
+    } catch (error) {
+        console.error('Error fetching active features:', error)
+        return []
+    }
+}
+
+export async function getFeatureById(id: string): Promise<Feature | null> {
+    try {
+        const supabase = await getSupabaseClient()
+        const { data, error } = await supabase
+            .from('Features')
+            .select(FEATURE_COLUMNS)
+            .eq('id', id)
+            .single()
+
+        if (error || !data) return null
+        return mapFeature(data)
+    } catch (error) {
+        console.error('Error fetching feature:', error)
+        return null
+    }
+}
+
+export async function createFeature(
+    feature: Omit<Feature, 'id' | 'createdAt' | 'updatedAt'>
+): Promise<Feature | null> {
+    try {
+        const supabase = await getSupabaseClient()
+
+        // Get max order
+        const { data: maxData } = await supabase
+            .from('Features')
+            .select('"order"')
+            .order('order', { ascending: false })
+            .limit(1)
+            .single()
+
+        const order = maxData ? maxData.order + 1 : 1
+
+        const { data, error } = await supabase
+            .from('Features')
+            .insert({
+                icon: feature.icon,
+                title: feature.title,
+                description: feature.description,
+                order: order,
+                active: feature.active !== undefined ? feature.active : true,
+            })
+            .select(FEATURE_COLUMNS)
+            .single()
+
+        if (error || !data) return null
+        return mapFeature(data)
+    } catch (error) {
+        console.error('Error creating feature:', error)
+        return null
+    }
+}
+
+export async function updateFeature(
+    id: string,
+    feature: Partial<Omit<Feature, 'id' | 'createdAt' | 'updatedAt'>>
+): Promise<Feature | null> {
+    try {
+        const supabase = await getSupabaseClient()
+        const { data, error } = await supabase
+            .from('Features')
+            .update({
+                icon: feature.icon,
+                title: feature.title,
+                description: feature.description,
+                order: feature.order,
+                active: feature.active,
+            })
+            .eq('id', id)
+            .select(FEATURE_COLUMNS)
+            .single()
+
+        if (error || !data) return null
+        return mapFeature(data)
+    } catch (error) {
+        console.error('Error updating feature:', error)
+        return null
+    }
+}
+
+export async function deleteFeature(id: string): Promise<boolean> {
+    try {
+        const supabase = await getSupabaseClient()
+        const { error } = await supabase
+            .from('Features')
+            .delete()
+            .eq('id', id)
+
+        return !error
+    } catch (error) {
+        console.error('Error deleting feature:', error)
+        return false
+    }
+}
+
+export async function reorderFeatures(featureOrders: { id: string; order: number }[]): Promise<boolean> {
+    try {
+        const supabase = await getSupabaseClient()
+
+        for (const item of featureOrders) {
+            const { error } = await supabase
+                .from('Features')
+                .update({ order: item.order })
+                .eq('id', item.id)
+
+            if (error) throw error
+        }
+
+        return true
+    } catch (error) {
+        console.error('Error reordering features:', error)
+        return false
+    }
+}
+
+// ============ REASONS ============
+
+const REASON_COLUMNS = 'id, icon, title, description, "order", active, created_at, updated_at'
+
+function mapReason(data: any): Reason {
+    return {
+        id: data.id,
+        icon: data.icon,
+        title: data.title,
+        description: data.description,
+        order: data.order,
+        active: data.active,
+        createdAt: new Date(data.created_at),
+        updatedAt: new Date(data.updated_at),
+    }
+}
+
+export async function getAllReasons(): Promise<Reason[]> {
+    try {
+        const supabase = await getSupabaseClient()
+        const { data, error } = await supabase
+            .from('Reasons')
+            .select(REASON_COLUMNS)
+            .order('order', { ascending: true })
+
+        if (error || !data) return []
+        return data.map(mapReason)
+    } catch (error) {
+        console.error('Error fetching reasons:', error)
+        return []
+    }
+}
+
+export async function getActiveReasons(): Promise<Reason[]> {
+    try {
+        const supabase = await getSupabaseClient()
+        const { data, error } = await supabase
+            .from('Reasons')
+            .select(REASON_COLUMNS)
+            .eq('active', true)
+            .order('order', { ascending: true })
+
+        if (error || !data) return []
+        return data.map(mapReason)
+    } catch (error) {
+        console.error('Error fetching active reasons:', error)
+        return []
+    }
+}
+
+export async function getReasonById(id: string): Promise<Reason | null> {
+    try {
+        const supabase = await getSupabaseClient()
+        const { data, error } = await supabase
+            .from('Reasons')
+            .select(REASON_COLUMNS)
+            .eq('id', id)
+            .single()
+
+        if (error || !data) return null
+        return mapReason(data)
+    } catch (error) {
+        console.error('Error fetching reason:', error)
+        return null
+    }
+}
+
+export async function createReason(
+    reason: Omit<Reason, 'id' | 'createdAt' | 'updatedAt'>
+): Promise<Reason | null> {
+    try {
+        const supabase = await getSupabaseClient()
+
+        // Get max order
+        const { data: maxData } = await supabase
+            .from('Reasons')
+            .select('"order"')
+            .order('order', { ascending: false })
+            .limit(1)
+            .single()
+
+        const order = maxData ? maxData.order + 1 : 1
+
+        const { data, error } = await supabase
+            .from('Reasons')
+            .insert({
+                icon: reason.icon,
+                title: reason.title,
+                description: reason.description,
+                order: order,
+                active: reason.active !== undefined ? reason.active : true,
+            })
+            .select(REASON_COLUMNS)
+            .single()
+
+        if (error || !data) return null
+        return mapReason(data)
+    } catch (error) {
+        console.error('Error creating reason:', error)
+        return null
+    }
+}
+
+export async function updateReason(
+    id: string,
+    reason: Partial<Omit<Reason, 'id' | 'createdAt' | 'updatedAt'>>
+): Promise<Reason | null> {
+    try {
+        const supabase = await getSupabaseClient()
+        const { data, error } = await supabase
+            .from('Reasons')
+            .update({
+                icon: reason.icon,
+                title: reason.title,
+                description: reason.description,
+                order: reason.order,
+                active: reason.active,
+            })
+            .eq('id', id)
+            .select(REASON_COLUMNS)
+            .single()
+
+        if (error || !data) return null
+        return mapReason(data)
+    } catch (error) {
+        console.error('Error updating reason:', error)
+        return null
+    }
+}
+
+export async function deleteReason(id: string): Promise<boolean> {
+    try {
+        const supabase = await getSupabaseClient()
+        const { error } = await supabase
+            .from('Reasons')
+            .delete()
+            .eq('id', id)
+
+        return !error
+    } catch (error) {
+        console.error('Error deleting reason:', error)
+        return false
+    }
+}
+
+export async function reorderReasons(reasonOrders: { id: string; order: number }[]): Promise<boolean> {
+    try {
+        const supabase = await getSupabaseClient()
+
+        for (const item of reasonOrders) {
+            const { error } = await supabase
+                .from('Reasons')
+                .update({ order: item.order })
+                .eq('id', item.id)
+
+            if (error) throw error
+        }
+
+        return true
+    } catch (error) {
+        console.error('Error reordering reasons:', error)
         return false
     }
 }

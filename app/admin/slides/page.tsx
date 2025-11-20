@@ -9,9 +9,9 @@ import { Label } from "@/components/ui/label"
 import { useToast } from "@/components/ui/toast"
 import { ConfirmDialog } from "@/components/ui/confirm-dialog"
 import { ImageUpload } from "@/components/editor/image-upload"
-import { Spinner } from "@/components/ui/spinner"
 import { Plus, Edit, Trash2, GripVertical, Eye, EyeOff } from "lucide-react"
 import { getImageUrl } from "@/lib/image-utils"
+import { Skeleton } from "@/components/ui/skeleton"
 import {
     Dialog,
     DialogContent,
@@ -27,6 +27,24 @@ interface SlideFormData {
     image: string
     link: string
 }
+
+const SlideSkeletonCard = () => (
+    <Card className="overflow-hidden border animate-pulse">
+        <div className="w-full h-32 bg-muted" />
+        <CardContent className="p-4 space-y-3">
+            <div className="flex items-center gap-2">
+                <Skeleton className="h-5 w-32" />
+                <Skeleton className="h-5 w-10" />
+            </div>
+            <Skeleton className="h-4 w-3/4" />
+            <div className="flex gap-2">
+                <Skeleton className="h-8 w-20" />
+                <Skeleton className="h-8 w-20" />
+                <Skeleton className="h-8 w-20" />
+            </div>
+        </CardContent>
+    </Card>
+)
 
 export default function AdminSlidesPage() {
     const [slides, setSlides] = useState<Slide[]>([])
@@ -212,14 +230,6 @@ export default function AdminSlidesPage() {
         }
     }
 
-    if (loading) {
-        return (
-            <div className="flex justify-center items-center min-h-[400px]">
-                <Spinner className="w-8 h-8" />
-            </div>
-        )
-    }
-
     return (
         <div className="container py-4 sm:py-6 px-3 sm:px-4">
             <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3 sm:gap-0 mb-4 sm:mb-6">
@@ -235,7 +245,13 @@ export default function AdminSlidesPage() {
                 </Button>
             </div>
 
-            {slides.length === 0 ? (
+            {loading ? (
+                <div className="grid gap-3 sm:gap-4">
+                    {Array.from({ length: 3 }).map((_, index) => (
+                        <SlideSkeletonCard key={`slide-skeleton-${index}`} />
+                    ))}
+                </div>
+            ) : slides.length === 0 ? (
                 <Card>
                     <CardContent className="py-12 text-center">
                         <p className="text-muted-foreground">

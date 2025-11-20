@@ -33,27 +33,23 @@ import type { User } from "@/lib/db"
 import { ConfirmDialog } from "@/components/ui/confirm-dialog"
 import { ViewUserModal } from "./view-user-modal"
 import { EditUserModal } from "./edit-user-modal"
-import { Spinner } from "@/components/ui/spinner"
 import { cn } from "@/lib/utils"
-import { CreateAdminModal, NewAdminFormState } from "./create-admin-modal"
+import { Skeleton } from "@/components/ui/skeleton"
 
 interface UserListTableProps {
   users: User[]
   onDeleteUser: (userId: string) => Promise<void> | void
   onUpdateUser: (userId: string, data: { name?: string; role?: string }) => Promise<void>
   loading: boolean
-  onCreateAdmin: (data: NewAdminFormState) => Promise<void>
 }
 
-export function UserListTable({ users, onDeleteUser, onUpdateUser, loading, onCreateAdmin }: UserListTableProps) {
+export function UserListTable({ users, onDeleteUser, onUpdateUser, loading }: UserListTableProps) {
   const [confirmingUserId, setConfirmingUserId] = useState<string | null>(null)
   const [deletingUserId, setDeletingUserId] = useState<string | null>(null)
   const [viewingUserId, setViewingUserId] = useState<string | null>(null)
   const [editingUserId, setEditingUserId] = useState<string | null>(null)
   const [updatingUserId, setUpdatingUserId] = useState<string | null>(null)
   const [sorting, setSorting] = useState<SortingState>([])
-  const [modalOpen, setModalOpen] = useState(false)
-  const [creatingAdmin, setCreatingAdmin] = useState(false)
 
   const handleDelete = async (userId: string) => {
     setDeletingUserId(userId)
@@ -72,16 +68,6 @@ export function UserListTable({ users, onDeleteUser, onUpdateUser, loading, onCr
       setEditingUserId(null)
     } finally {
       setUpdatingUserId(null)
-    }
-  }
-
-  const handleCreateAdmin = async (formData: NewAdminFormState) => {
-    setCreatingAdmin(true)
-    try {
-      await onCreateAdmin(formData)
-      setTimeout(() => setModalOpen(false), 500)
-    } finally {
-      setCreatingAdmin(false)
     }
   }
 
@@ -327,9 +313,6 @@ export function UserListTable({ users, onDeleteUser, onUpdateUser, loading, onCr
         loading={updatingUserId !== null}
       />
       <div className="border rounded-lg overflow-hidden">
-        <div className="p-4 border-b flex justify-end">
-          <Button onClick={() => setModalOpen(true)}>Tạo quản trị viên</Button>
-        </div>
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -346,11 +329,18 @@ export function UserListTable({ users, onDeleteUser, onUpdateUser, loading, onCr
           </TableHeader>
           <TableBody>
             {loading ? (
-              <TableRow>
-                <TableCell colSpan={columns.length} className="text-center">
-                  <Spinner />
-                </TableCell>
-              </TableRow>
+              Array.from({ length: 6 }).map((_, index) => (
+                <TableRow key={`skeleton-${index}`}>
+                  <TableCell colSpan={columns.length}>
+                    <div className="flex items-center gap-4 py-2">
+                      <Skeleton className="h-4 w-32" />
+                      <Skeleton className="h-4 w-48" />
+                      <Skeleton className="h-4 w-24" />
+                      <Skeleton className="h-4 w-20 ml-auto" />
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
             ) : table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow key={row.id} className="hover:bg-muted/50 transition-colors">
@@ -371,12 +361,6 @@ export function UserListTable({ users, onDeleteUser, onUpdateUser, loading, onCr
           </TableBody>
         </Table>
       </div>
-      <CreateAdminModal
-        open={modalOpen}
-        onOpenChange={setModalOpen}
-        onCreate={handleCreateAdmin}
-        loading={creatingAdmin}
-      />
       {table.getPageCount() > 1 && (
         <div className="flex items-center justify-end space-x-2 py-4">
           <div className="flex-1 text-sm text-muted-foreground">

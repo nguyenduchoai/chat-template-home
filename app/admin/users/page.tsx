@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react"
 import { UserListTable } from "./common/user-list-table"
 import { UserListHeader } from "./common/user-list-header"
-import { Spinner } from "@/components/ui/spinner"
 import { Button } from "@/components/ui/button"
 import { CreateAdminModal, NewAdminFormState } from "./common/create-admin-modal"
 import { User } from "@/lib/db"
@@ -14,6 +13,8 @@ export default function AdminUsersPage() {
   const [filteredUsers, setFilteredUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
+  const [isCreateOpen, setIsCreateOpen] = useState(false)
+  const [isCreatingAdmin, setIsCreatingAdmin] = useState(false)
   const { showToast } = useToast()
 
   useEffect(() => {
@@ -61,7 +62,7 @@ export default function AdminUsersPage() {
   }
 
   const handleCreateAdmin = async (formData: NewAdminFormState) => {
-
+    setIsCreatingAdmin(true)
     try {
       const response = await fetch("/api/admin/users", {
         method: "POST",
@@ -77,9 +78,11 @@ export default function AdminUsersPage() {
       const createdUser = await response.json()
       setUsers((prev) => [createdUser, ...prev])
       showToast("success", "Đã tạo quản trị viên mới thành công")
-
+      setIsCreateOpen(false)
     } catch (error: any) {
       showToast("error", error.message || "Không thể tạo quản trị viên")
+    } finally {
+      setIsCreatingAdmin(false)
     }
   }
 
@@ -107,13 +110,23 @@ export default function AdminUsersPage() {
 
   return (
     <main className="container py-8 px-4 space-y-8">
-      <UserListHeader onSearch={setSearchTerm} totalUsers={filteredUsers.length} />
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <UserListHeader onSearch={setSearchTerm} totalUsers={filteredUsers.length} />
+        <Button className="w-full md:w-auto" onClick={() => setIsCreateOpen(true)}>
+          Thêm quản trị viên
+        </Button>
+      </div>
       <UserListTable
-        onCreateAdmin={handleCreateAdmin}
         loading={loading}
         users={filteredUsers}
         onDeleteUser={handleDeleteUser}
         onUpdateUser={handleUpdateUser}
+      />
+      <CreateAdminModal
+        open={isCreateOpen}
+        onOpenChange={setIsCreateOpen}
+        onCreate={handleCreateAdmin}
+        loading={isCreatingAdmin}
       />
     </main>
   )

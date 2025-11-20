@@ -20,6 +20,10 @@ const DEFAULT_SETTINGS = {
     keywords: "",
     bannerTitle: "",
     bannerDescription: "",
+    featuresTitle: "",
+    featuresDescription: "",
+    reasonsTitle: "",
+    reasonsDescription: "",
     author: "",
     email: "",
     phone: "",
@@ -176,6 +180,40 @@ export default function AdminSettingsPage() {
                                 <div className="space-y-2">
                                     <label className="text-sm font-medium">Mô tả Banner</label>
                                     <Textarea value={settings.bannerDescription} onChange={handleChange("bannerDescription")} rows={3} placeholder="Khám phá sức mạnh..." />
+                                </div>
+                            </CardContent>
+                        </Card>
+
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Section Tính năng</CardTitle>
+                                <CardDescription>Tiêu đề và mô tả section các tính năng</CardDescription>
+                            </CardHeader>
+                            <CardContent className="space-y-4">
+                                <InputDiv>
+                                    <label className="text-sm font-medium">Tiêu đề</label>
+                                    <Input value={settings.featuresTitle} onChange={handleChange("featuresTitle")} placeholder="Tại sao chọn AI nha khoa?" />
+                                </InputDiv>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium">Mô tả</label>
+                                    <Textarea value={settings.featuresDescription} onChange={handleChange("featuresDescription")} rows={2} placeholder="Nền tảng AI..." />
+                                </div>
+                            </CardContent>
+                        </Card>
+
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Section Lý do chọn</CardTitle>
+                                <CardDescription>Tiêu đề và mô tả section số liệu</CardDescription>
+                            </CardHeader>
+                            <CardContent className="space-y-4">
+                                <InputDiv>
+                                    <label className="text-sm font-medium">Tiêu đề</label>
+                                    <Input value={settings.reasonsTitle} onChange={handleChange("reasonsTitle")} placeholder="Số liệu ấn tượng" />
+                                </InputDiv>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium">Mô tả</label>
+                                    <Textarea value={settings.reasonsDescription} onChange={handleChange("reasonsDescription")} rows={2} placeholder="Những con số chứng minh..." />
                                 </div>
                             </CardContent>
                         </Card>

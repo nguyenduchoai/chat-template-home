@@ -2,11 +2,12 @@ import Banner from "@/components/Banner"
 import ChatBar from "@/components/ChatBar"
 import PostCard from "@/components/PostCard"
 import SlideShow from "@/components/SlideShow"
+import FeaturesSection from "@/components/FeaturesSection"
+import ReasonsSection from "@/components/ReasonsSection"
 import { getPublishedPosts } from "@/lib/db"
 
 async function getPosts() {
   try {
-    // Fetch từ Supabase database
     const posts = await getPublishedPosts(6)
     return posts
   } catch (error) {
@@ -24,8 +25,11 @@ export default async function Home() {
       <Banner />
       <ChatBar />
 
+      <FeaturesSection />
+      <ReasonsSection />
+
       <section className="container py-12 px-4">
-        <div className="mb-8">
+        <div className="mb-8 ">
           <h2 className="text-3xl font-bold tracking-tight">Bài viết mới nhất</h2>
           <p className="text-muted-foreground mt-2">
             Khám phá các bài viết về AI và công nghệ

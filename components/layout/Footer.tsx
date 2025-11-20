@@ -35,8 +35,8 @@ export default function Footer() {
     }
 
     return (
-        <footer className="border-t bg-gradient-to-br from-primary/5 via-background to-background">
-            <div className="container px-4 py-12 grid gap-8 md:grid-cols-3 mx-auto">
+        <footer className="bg-gradient-to-b from-white via-blue-50/40 to-blue-50 border-t border-slate-100 mt-12 text-slate-900">
+            <div className="container px-4 py-10 grid gap-10 md:grid-cols-3 mx-auto">
                 <div className="space-y-4">
                     <Link href="/" className="flex items-center space-x-3">
                         {siteInfo.logo ? (
@@ -45,12 +45,12 @@ export default function Footer() {
                             </span>
                         ) : null}
                         <div className="flex-1">
-                            <p className="text-lg font-semibold">{siteInfo.name ?? siteInfo.title}</p>
-                            <p className="text-sm text-muted-foreground">{siteInfo.description}</p>
+                            <p className="text-lg font-semibold text-slate-900">{siteInfo.name ?? siteInfo.title}</p>
+                            <p className="text-sm text-slate-500">{siteInfo.description}</p>
                         </div>
                     </Link>
                     {socials.length > 0 && (
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-3 flex-wrap">
                             {socials.map(({ key, label, icon: Icon }) => (
                                 <Link
                                     key={key}
@@ -58,7 +58,7 @@ export default function Footer() {
                                     target="_blank"
                                     rel="noreferrer"
                                     aria-label={label}
-                                    className="flex h-9 w-9 items-center justify-center rounded-full border border-border text-muted-foreground hover:text-foreground transition-colors"
+                                    className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 text-slate-500 hover:text-blue-600 transition-colors bg-white"
                                 >
                                     <Icon className="h-4 w-4" />
                                 </Link>
@@ -68,11 +68,11 @@ export default function Footer() {
                 </div>
 
                 <div>
-                    <p className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-3">Điều hướng</p>
+                    <p className="text-xs font-semibold uppercase tracking-[0.25em] text-slate-500 mb-4">Điều hướng</p>
                     <ul className="space-y-2">
                         {navLinks.map((link) => (
                             <li key={link.href}>
-                                <Link href={link.href} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                                <Link href={link.href} className="text-sm font-medium text-slate-700 hover:text-blue-600 transition-colors">
                                     {link.label}
                                 </Link>
                             </li>
@@ -81,15 +81,25 @@ export default function Footer() {
                 </div>
 
                 <div className="space-y-2">
-                    <p className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Liên hệ</p>
-                    {siteInfo.address && <p className="text-sm text-muted-foreground">{siteInfo.address}</p>}
-                    {siteInfo.contact && <p className="text-sm text-muted-foreground">{siteInfo.contact}</p>}
-                    {siteInfo.email && <p className="text-sm text-muted-foreground">Email: {siteInfo.email}</p>}
-                    {siteInfo.phone && <p className="text-sm text-muted-foreground">SĐT: {siteInfo.phone}</p>}
+                    <p className="text-xs font-semibold uppercase tracking-[0.25em] text-slate-500">Liên hệ</p>
+                    {siteInfo.address && <p className="text-sm text-slate-700">{siteInfo.address}</p>}
+                    {siteInfo.contact && <p className="text-sm text-slate-700">{siteInfo.contact}</p>}
+                    {siteInfo.email && (
+                        <p className="text-sm text-slate-700">
+                            <span className="font-semibold text-slate-900">Email: </span>
+                            {siteInfo.email}
+                        </p>
+                    )}
+                    {siteInfo.phone && (
+                        <p className="text-sm text-slate-700">
+                            <span className="font-semibold text-slate-900">SĐT: </span>
+                            {siteInfo.phone}
+                        </p>
+                    )}
                 </div>
             </div>
             <div className="border-t">
-                <div className="p-4 text-center text-xs text-muted-foreground">
+                <div className="p-4 text-center text-xs text-slate-500">
                     {`© ${new Date().getFullYear()} ${siteInfo.author}`}
                 </div>
             </div>

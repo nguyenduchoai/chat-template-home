@@ -16,6 +16,7 @@ interface ImageUploadProps {
   bucket?: string
   folder?: string
   enableLibrary?: boolean
+  previewHeight?: number
 }
 
 type LibraryImage = {
@@ -32,6 +33,7 @@ export function ImageUpload({
   bucket = "images",
   folder = "posts",
   enableLibrary = false,
+  previewHeight = 256,
 }: ImageUploadProps) {
   const [uploading, setUploading] = useState(false)
   const [preview, setPreview] = useState<string | null>(value ? getImageUrl(value) : null)
@@ -161,7 +163,10 @@ export function ImageUpload({
       <div className="space-y-2">
         {preview ? (
           <div className="relative group">
-            <div className="relative w-full h-64 rounded-lg overflow-hidden border">
+            <div
+              className="relative w-full rounded-lg overflow-hidden border"
+              style={{ height: previewHeight }}
+            >
               <img src={preview} alt="Preview" className="w-full h-full object-cover" />
               <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                 <Button
@@ -181,9 +186,10 @@ export function ImageUpload({
         ) : (
           <div
             className={cn(
-              "border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors",
+              "border-2 border-dashed rounded-lg text-center cursor-pointer transition-colors flex items-center justify-center",
               uploading ? "border-primary bg-primary/5" : "border-muted-foreground/25 hover:border-primary/50"
             )}
+            style={{ minHeight: previewHeight }}
             onClick={() => !uploading && fileInputRef.current?.click()}
           >
             <input
@@ -209,18 +215,6 @@ export function ImageUpload({
               </div>
             )}
           </div>
-        )}
-        {preview && !uploading && (
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() => fileInputRef.current?.click()}
-            className="w-full"
-          >
-            <Upload className="h-4 w-4 mr-2" />
-            Thay đổi ảnh
-          </Button>
         )}
         {enableLibrary && (
           <>
