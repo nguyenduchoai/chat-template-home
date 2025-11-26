@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "postbuild": "npm run init-admin",
     "start": "next start",
     "lint": "eslint",
     "init-admin": "tsx scripts/init-admin.ts",
