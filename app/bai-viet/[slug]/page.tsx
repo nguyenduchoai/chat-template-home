@@ -1,27 +1,10 @@
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import Image from "next/image"
-import type { Post } from "@/lib/db"
+import { getPostBySlug } from "@/lib/db"
 import { format } from "date-fns"
 import { vi } from "date-fns/locale"
 import { getImageUrl, transformHtmlImageUrls } from "@/lib/image-utils"
-
-async function fetchPost(slug: string): Promise<Post | null> {
-    try {
-        const response = await fetch(`/api/public/posts/${slug}`, { cache: "no-store" })
-        if (!response.ok) return null
-        const data = await response.json()
-        return {
-            ...data,
-            publishedAt: data.publishedAt ? new Date(data.publishedAt) : null,
-            createdAt: data.createdAt ? new Date(data.createdAt) : null,
-            updatedAt: data.updatedAt ? new Date(data.updatedAt) : null,
-        }
-    } catch (error: any) {
-        console.error("Error fetching post:", error)
-        return null
-    }
-}
 
 export default async function PostDetailPage({
     params,
@@ -29,7 +12,7 @@ export default async function PostDetailPage({
     params: Promise<{ slug: string }>
 }) {
     const { slug } = await params
-    const post = await fetchPost(slug)
+    const post = await getPostBySlug(slug)
 
     if (!post) {
         notFound()

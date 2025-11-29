@@ -3,7 +3,6 @@ import { useState, useEffect, useRef } from 'react';
 import DefaultChat from './common/DefaultChat';
 import MarkdownMessage from './common/MarkdownMessage';
 import ScrollToBottom from 'react-scroll-to-bottom';
-import Head from 'next/head';
 import { CopyIcon, SendIcon } from 'lucide-react';
 import { DeletePopconfirm } from '@/components/custom-ui/delete-popconfirm';
 import { TypingLoadingPage } from './common/Loading';
@@ -48,11 +47,16 @@ const ChatContainer = () => {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload),
             });
-            if (!res.ok) throw new Error("StartChat API error");
-            return res.json();
+            if (!res.ok) {
+                const errorText = await res.text();
+                throw new Error(`StartChat API error: ${res.status} - ${errorText}`);
+            }
+            const data = await res.json();
+            return data;
         } catch (error) {
-
-            console.log("Error:", error);
+            console.error("Error starting chat:", error);
+            // Return null instead of undefined to prevent errors
+            return null;
         } finally {
             setLoadingChat(false);
         }
@@ -83,20 +87,53 @@ const ChatContainer = () => {
             setChatHistory(data?.histories.reverse() || []);
             setBotInfo(data);
             if (typeof window !== "undefined") {
-                const url = new URL(window.location.href);
-                const promptParam = url.searchParams.get("prompt");
-                const qParam = url.searchParams.get("q");
-                const initialPrompt = promptParam || qParam;
+                try {
+                    // Safari-compatible URL parsing with fallback
+                    let url: URL;
+                    try {
+                        url = new URL(window.location.href);
+                    } catch (e) {
+                        // Fallback for Safari compatibility
+                        const baseUrl = window.location.origin + window.location.pathname;
+                        url = new URL(baseUrl + window.location.search);
+                    }
+                    
+                    const promptParam = url.searchParams.get("prompt");
+                    const qParam = url.searchParams.get("q");
+                    const initialPrompt = promptParam || qParam;
 
-                if (initialPrompt) {
-                    handleGetPrompt(initialPrompt);
-                    if (promptParam) {
-                        url.searchParams.delete("prompt");
+                    if (initialPrompt) {
+                        handleGetPrompt(initialPrompt);
+                        // Update URL without causing Safari issues
+                        try {
+                            if (promptParam) {
+                                url.searchParams.delete("prompt");
+                            }
+                            if (qParam) {
+                                url.searchParams.delete("q");
+                            }
+                            const newUrl = url.toString();
+                            window.history.replaceState({}, "", newUrl);
+                        } catch (historyError) {
+                            // Safari fallback: use simpler URL update
+                            const searchParams = new URLSearchParams(window.location.search);
+                            searchParams.delete("prompt");
+                            searchParams.delete("q");
+                            const newSearch = searchParams.toString();
+                            const newUrl = window.location.pathname + (newSearch ? `?${newSearch}` : "");
+                            window.history.replaceState({}, "", newUrl);
+                        }
                     }
-                    if (qParam) {
-                        url.searchParams.delete("q");
+                } catch (urlError) {
+                    console.error("Error parsing URL:", urlError);
+                    // Fallback: try to get params from window.location.search directly
+                    const searchParams = new URLSearchParams(window.location.search);
+                    const promptParam = searchParams.get("prompt");
+                    const qParam = searchParams.get("q");
+                    const initialPrompt = promptParam || qParam;
+                    if (initialPrompt) {
+                        handleGetPrompt(initialPrompt);
                     }
-                    window.history.replaceState({}, "", url.toString());
                 }
             }
 
@@ -176,7 +213,26 @@ const ChatContainer = () => {
             .join("\n\n")
 
         try {
-            await navigator.clipboard.writeText(formatted)
+            // Safari-compatible clipboard API with fallback
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                await navigator.clipboard.writeText(formatted)
+            } else {
+                // Fallback for older Safari versions
+                const textArea = document.createElement("textarea")
+                textArea.value = formatted
+                textArea.style.position = "fixed"
+                textArea.style.left = "-999999px"
+                textArea.style.top = "-999999px"
+                document.body.appendChild(textArea)
+                textArea.focus()
+                textArea.select()
+                try {
+                    document.execCommand("copy")
+                } catch (err) {
+                    console.error("Fallback copy failed:", err)
+                }
+                document.body.removeChild(textArea)
+            }
         } catch (error) {
             console.error("Failed to copy chat history:", error)
         }
@@ -193,8 +249,7 @@ const ChatContainer = () => {
     }
     return (
         <>
-            <Head>
-                <style>{`
+            <style dangerouslySetInnerHTML={{__html: `
     .chat-container {
       margin: 0 auto;
       display: flex;
@@ -225,8 +280,7 @@ const ChatContainer = () => {
       margin-right: auto;
       text-align: left;
     }
-  `}</style>
-            </Head>
+  `}} />
             <div className="flex flex-1 flex-col w-full scroll-hidden lg:px-[calc((100vw_-_310px)*0.3/2)]">
                 {chatHistory?.length > 0 ? (
                     <ScrollToBottom className="h-0 flex-1 overflow-auto scroll-hidden p-2 min-h-0 pt-18 pb-[84px]">

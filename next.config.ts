@@ -17,6 +17,18 @@ const nextConfig: NextConfig = {
     ],
     unoptimized: false,
   },
+  // Tắt source map trong dev mode để tránh lỗi source map
+  productionBrowserSourceMaps: false,
+  // Cấu hình Turbopack (dùng cho dev mode trong Next.js 16)
+  // Thêm config rỗng để silence warning về Turbopack
+  turbopack: {},
+  // Cấu hình webpack (dùng cho production build)
+  webpack: (config, { dev, isServer }) => {
+    if (dev) {
+      config.devtool = false;
+    }
+    return config;
+  },
 };
 
 export default nextConfig;

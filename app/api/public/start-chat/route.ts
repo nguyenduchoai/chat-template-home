@@ -32,6 +32,9 @@ export async function POST(req: Request) {
         res.cookies.set("thread_id", threadId, {
             httpOnly: true,
             maxAge: 60 * 60 * 24 * 7,
+            sameSite: "lax", // Safari-compatible
+            secure: process.env.NODE_ENV === "production", // HTTPS in production
+            path: "/", // Ensure cookie is available across the site
         });
 
         return res;
