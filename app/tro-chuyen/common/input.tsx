@@ -65,8 +65,21 @@ export function ChatInput({
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
-        if (message.trim() && !disabled && !isGenerating) {
-            onSend?.(message)
+        const trimmedMessage = message.trim()
+        
+        // Validation
+        if (!trimmedMessage) {
+            return // Don't submit empty messages
+        }
+        
+        // Max length validation
+        const MAX_MESSAGE_LENGTH = 10000
+        if (trimmedMessage.length > MAX_MESSAGE_LENGTH) {
+            return // Validation will be handled in parent component
+        }
+        
+        if (!disabled && !isGenerating) {
+            onSend?.(trimmedMessage)
             setMessage("")
             if (textareaRef.current) {
                 textareaRef.current.style.height = "auto"
@@ -113,11 +126,19 @@ export function ChatInput({
                         <textarea
                             ref={textareaRef}
                             value={message}
-                            onChange={(e) => setMessage(e.target.value)}
+                            onChange={(e) => {
+                                const value = e.target.value
+                                // Limit max length
+                                const MAX_MESSAGE_LENGTH = 10000
+                                if (value.length <= MAX_MESSAGE_LENGTH) {
+                                    setMessage(value)
+                                }
+                            }}
                             onKeyDown={handleKeyDown}
                             placeholder={placeholder}
                             disabled={disabled || isGenerating}
                             rows={1}
+                            maxLength={10000}
                             className={cn(
                                 "flex-1 resize-none bg-transparent px-0 py-1.5 sm:py-2",
                                 "text-sm sm:text-base",

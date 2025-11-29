@@ -8,12 +8,14 @@ import { DeletePopconfirm } from '@/components/custom-ui/delete-popconfirm';
 import { TypingLoadingPage } from './common/Loading';
 import ClosedChat from './common/ClosedChat';
 import { ChatInput } from './common/input';
+import { toast } from 'sonner';
 
 const ChatContainer = () => {
     const [botInfo, setBotInfo] = useState<any>(undefined);
     const [chatHistory, setChatHistory] = useState([]);
     const [loading, setLoading] = useState(false);
     const [loadingChat, setLoadingChat] = useState(false);
+    const [hasTriedLoad, setHasTriedLoad] = useState(false); // Track if we've attempted to load
     const [siteLogo, setSiteLogo] = useState<string | null>(null);
     const messagesEndRef = useRef<any>(null);
     useEffect(() => {
@@ -26,7 +28,9 @@ const ChatContainer = () => {
     useEffect(() => {
         const fetchSiteLogo = async () => {
             try {
-                const res = await fetch("/api/public/site-info")
+                const res = await fetch("/api/public/site-info", {
+                    credentials: "include", // Safari requires this to send cookies
+                })
                 if (res.ok) {
                     const data = await res.json()
                     if (data.logo) {
@@ -46,6 +50,7 @@ const ChatContainer = () => {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload),
+                credentials: "include", // CRITICAL: Safari requires this to send/receive cookies
             });
             if (!res.ok) {
                 const errorText = await res.text();
@@ -67,12 +72,42 @@ const ChatContainer = () => {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload),
+                credentials: "include", // Safari requires this to send cookies
             });
 
-            if (!res.ok) throw new Error("Chat API error");
-            return res.json();
-        } catch (error) {
+            if (!res.ok) {
+                const errorText = await res.text();
+                let errorMessage = "Không thể gửi tin nhắn";
+                
+                if (res.status === 401) {
+                    errorMessage = "Phiên đăng nhập đã hết hạn. Vui lòng làm mới trang.";
+                } else if (res.status === 429) {
+                    errorMessage = "Quá nhiều yêu cầu. Vui lòng thử lại sau.";
+                } else if (res.status >= 500) {
+                    errorMessage = "Lỗi server. Vui lòng thử lại sau.";
+                } else if (errorText) {
+                    try {
+                        const errorData = JSON.parse(errorText);
+                        errorMessage = errorData.message || errorMessage;
+                    } catch {
+                        errorMessage = errorText || errorMessage;
+                    }
+                }
+                
+                throw new Error(errorMessage);
+            }
+            
+            const data = await res.json();
+            
+            // Validate response data
+            if (!data || !data.message) {
+                throw new Error("Phản hồi không hợp lệ từ server");
+            }
+            
+            return data;
+        } catch (error: any) {
             console.error("Failed to send message:", error);
+            throw error; // Re-throw to handle in calling function
         } finally {
             setLoading(false);
         }
@@ -83,9 +118,17 @@ const ChatContainer = () => {
 
     const handleStartChat = async (payload: any = {}) => {
         try {
+            setHasTriedLoad(true); // Mark that we've attempted to load
             const data = await startChat(payload);
-            setChatHistory(data?.histories.reverse() || []);
-            setBotInfo(data);
+            // Only update state if data is valid
+            if (data) {
+                setChatHistory(data?.histories?.reverse() || []);
+                setBotInfo(data);
+            } else {
+                // If data is null, set botInfo to null to show ClosedChat
+                setBotInfo(null);
+                console.warn("Failed to start chat - no data returned");
+            }
             if (typeof window !== "undefined") {
                 try {
                     // Safari-compatible URL parsing with fallback
@@ -143,62 +186,104 @@ const ChatContainer = () => {
     };
 
     const handleSendMessage = async (message: string, files?: File[]) => {
-        if (message.trim()) {
-            setChatHistory((prev: any) => [
-                ...prev,
-                {
-                    _id: String as any,
-                    sender: "user" as string,
-                    timestamp: Date.now() as any,
-                    message: message as string,
-                },
-            ] as any);
-            setLoading(true);
-
-            try {
-                const botResponse = await chat({
-                    message: message,
-                });
-                setChatHistory((prev: any) => [
-                    ...prev,
-                    {
-                        _id: String,
-                        sender: "assistant",
-                        timestamp: Date.now(),
-                        message: botResponse.message,
-                    },
-                ] as any);
-            } catch (error) {
-                console.error("Failed to send message:", error);
-            } finally {
-                setLoading(false);
-            }
+        // Validation
+        const trimmedMessage = message.trim();
+        if (!trimmedMessage) {
+            toast.error("Vui lòng nhập nội dung tin nhắn");
+            return;
         }
-    }
-    const handleGetPrompt = async (prompt: string) => {
+
+        // Max length validation (e.g., 10000 characters)
+        const MAX_MESSAGE_LENGTH = 10000;
+        if (trimmedMessage.length > MAX_MESSAGE_LENGTH) {
+            toast.error(`Tin nhắn quá dài. Tối đa ${MAX_MESSAGE_LENGTH} ký tự.`);
+            return;
+        }
+
+        // Add user message to chat history
+        const userMessageId = `user-${Date.now()}-${Math.random()}`;
         setChatHistory((prev: any) => [
             ...prev,
             {
-                _id: String,
+                _id: userMessageId,
                 sender: "user",
                 timestamp: Date.now(),
-                message: prompt,
+                message: trimmedMessage,
             },
         ] as any);
         setLoading(true);
+
         try {
-            const botResponse = await chat({ message: prompt });
+            const botResponse = await chat({
+                message: trimmedMessage,
+            });
+            
+            // Add bot response to chat history
             setChatHistory((prev: any) => [
                 ...prev,
                 {
-                    _id: String,
+                    _id: `assistant-${Date.now()}-${Math.random()}`,
                     sender: "assistant",
                     timestamp: Date.now(),
                     message: botResponse.message,
                 },
             ] as any);
-        } catch (error) {
+        } catch (error: any) {
             console.error("Failed to send message:", error);
+            
+            // Remove user message on error (rollback)
+            setChatHistory((prev: any) => 
+                prev.filter((msg: any) => msg._id !== userMessageId)
+            );
+            
+            // Show error toast
+            const errorMessage = error?.message || "Không thể gửi tin nhắn. Vui lòng thử lại.";
+            toast.error(errorMessage);
+        } finally {
+            setLoading(false);
+        }
+    }
+    const handleGetPrompt = async (prompt: string) => {
+        const trimmedPrompt = prompt.trim();
+        if (!trimmedPrompt) {
+            toast.error("Prompt không hợp lệ");
+            return;
+        }
+
+        const userMessageId = `user-${Date.now()}-${Math.random()}`;
+        setChatHistory((prev: any) => [
+            ...prev,
+            {
+                _id: userMessageId,
+                sender: "user",
+                timestamp: Date.now(),
+                message: trimmedPrompt,
+            },
+        ] as any);
+        setLoading(true);
+        
+        try {
+            const botResponse = await chat({ message: trimmedPrompt });
+            setChatHistory((prev: any) => [
+                ...prev,
+                {
+                    _id: `assistant-${Date.now()}-${Math.random()}`,
+                    sender: "assistant",
+                    timestamp: Date.now(),
+                    message: botResponse.message,
+                },
+            ] as any);
+        } catch (error: any) {
+            console.error("Failed to send message:", error);
+            
+            // Remove user message on error (rollback)
+            setChatHistory((prev: any) => 
+                prev.filter((msg: any) => msg._id !== userMessageId)
+            );
+            
+            // Show error toast
+            const errorMessage = error?.message || "Không thể gửi tin nhắn. Vui lòng thử lại.";
+            toast.error(errorMessage);
         } finally {
             setLoading(false);
         }
@@ -244,8 +329,13 @@ const ChatContainer = () => {
     if (loadingChat) {
         return <TypingLoadingPage />;
     }
-    if (!botInfo && !loadingChat) {
+    // Only show ClosedChat if we've tried to load and got no data (null)
+    if (hasTriedLoad && botInfo === null && !loadingChat) {
         return <ClosedChat />;
+    }
+    // Show loading if botInfo is still undefined (initial state before first load attempt)
+    if (!hasTriedLoad || botInfo === undefined) {
+        return <TypingLoadingPage />;
     }
     return (
         <>
