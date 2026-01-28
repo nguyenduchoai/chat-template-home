@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { requireAdmin } from "@/lib/auth-supabase"
+import { requireAdmin } from "@/lib/auth"
 import { getSiteInfoRecord, updateSiteInfoRecord } from "@/lib/db"
 
 export async function GET() {

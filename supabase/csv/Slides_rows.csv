@@ -1,3 +1,0 @@
-id,title,image,link,order,active,created_at,updated_at
-19ac826f-31b8-4a69-8c46-7ce533d73d23,test 3,https://udgtptskavwqxmrjvktz.supabase.co/storage/v1/object/public/images/slides/66529w-1763472927194.jpg,http://localhost:3000/admin/slides,2,true,2025-11-18 13:43:16.591235+00,2025-11-18 13:43:21.695942+00
-7f16c3df-c8ba-4180-b313-3959d995cda9,"Đây là slide 2 ",https://udgtptskavwqxmrjvktz.supabase.co/storage/v1/object/public/images/slides/66529w-1763472927194.jpg,http://example.com/link/to/document,0,true,2025-11-18 13:39:59.050878+00,2025-11-18 15:15:36.735247+00

@@ -28,18 +28,17 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
-import { useSupabaseSession } from "@/hooks/useSupabaseSession"
-import { createSupabaseClient } from "@/lib/supabase"
+import { useSession } from "@/hooks/useSession"
 import { useRouter } from "next/navigation"
 
 export function NavUser() {
   const { isMobile } = useSidebar()
 
-  const { user } = useSupabaseSession()
-  const supabase = createSupabaseClient()
+  const { user } = useSession()
   const router = useRouter()
+  
   const handleSignOut = async () => {
-    await supabase.auth.signOut()
+    await fetch("/api/auth/signout", { method: "POST" })
     router.push("/login")
     router.refresh()
   }

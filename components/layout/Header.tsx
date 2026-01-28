@@ -2,8 +2,7 @@
 
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { useSupabaseSession } from "@/hooks/useSupabaseSession"
-import { createSupabaseClient } from "@/lib/supabase"
+import { useSession } from "@/hooks/useSession"
 import { Button } from "@/components/ui/button"
 import { MessageSquare, User, LogOut, BookOpen, Phone, Menu, X } from "lucide-react"
 import { useSiteInfo } from "@/components/providers/SiteInfoProvider"
@@ -18,15 +17,14 @@ import {
 } from "@/components/ui/sheet"
 
 export default function Header() {
-    const { user, loading } = useSupabaseSession()
+    const { user, loading } = useSession()
     const pathname = usePathname()
     const router = useRouter()
-    const supabase = createSupabaseClient()
     const siteInfo = useSiteInfo()
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
     const handleSignOut = async () => {
-        await supabase.auth.signOut()
+        await fetch("/api/auth/signout", { method: "POST" })
         router.push("/login")
         router.refresh()
         setMobileMenuOpen(false)

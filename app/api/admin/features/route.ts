@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAllFeatures, createFeature, reorderFeatures } from '@/lib/db'
-import { getCurrentUser, requireAdmin } from '@/lib/auth-supabase'
+import { requireAdmin } from '@/lib/auth'
 
 export async function GET() {
     try {

@@ -1,3 +1,0 @@
-id,email,name,password,image,role,emailVerified,createdAt,updatedAt
-6d9e906d-570b-4b00-b13a-2b8a553b672b,admsdain@gmail.com,đâsd,$2b$10$ivFDwDrzkm3bz2Sn8nNimuNRmIAcC1QxANDM8/gwGuiHfWOzG.sgi,,admin,,2025-11-18 05:19:40.017617,2025-11-18 05:19:40.017617
-758114f7-7703-4aa2-95c8-d2b2e33ef554,admin@gmail.com,Admin,$2b$10$ZoLIA9yzYubw.XjaaIc/QO19hKMAywhdwrzwgu9RVePWlki2n.U3W,,superadmin,,2025-11-17 15:18:38.660047,2025-11-18 04:14:49.684266

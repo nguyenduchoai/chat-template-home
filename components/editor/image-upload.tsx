@@ -16,7 +16,7 @@ interface ImageUploadProps {
   label?: string
   bucket?: string
   /**
-   * Thư mục lưu ảnh trong Supabase Storage
+   * Thư mục lưu ảnh trong Local Storage
    * Mặc định: "posts" - dùng cho ảnh bìa bài viết
    */
   folder?: string
@@ -125,10 +125,8 @@ export function ImageUpload({
       console.error("Error uploading image:", error)
       const errorMessage = error.message || "Có lỗi xảy ra khi tải ảnh lên"
       
-      if (errorMessage.includes("Bucket not found") || errorMessage.includes("not found")) {
-        showToast("error", `Bucket '${bucket}' chưa được tạo. Vui lòng tạo bucket trong Supabase Dashboard`)
-      } else if (errorMessage.includes("RLS") || errorMessage.includes("row-level security")) {
-        showToast("error", "Lỗi RLS policy. Vui lòng chạy SQL script trong supabase/migrations/002_storage_policies.sql")
+      if (errorMessage.includes("not found")) {
+        showToast("error", `Thư mục '${selectedFolder}' chưa được tạo. Vui lòng kiểm tra cấu hình`)
       } else {
         showToast("error", errorMessage)
       }

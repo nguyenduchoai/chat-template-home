@@ -2,18 +2,8 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
-    remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "**.supabase.co",
-        pathname: "/storage/**",
-      },
-    ],
-    // Cho phép proxy URL từ cùng domain với query string
+    // Local upload patterns
     localPatterns: [
-      {
-        pathname: "/api/admin/images/proxy**",
-      },
       {
         pathname: "/uploads/**",
       },

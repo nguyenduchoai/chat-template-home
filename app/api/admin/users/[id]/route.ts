@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { requireSuperadmin } from "@/lib/auth-supabase"
+import { requireSuperadmin } from "@/lib/auth"
 import { deleteUser, updateUser, getUserById } from "@/lib/db"
 
 export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> | { id: string } }) {

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { requireAdmin } from "@/lib/auth"
-import { deleteImage, isSupabaseConfigured } from "@/lib/storage"
+import { deleteImage } from "@/lib/storage"
 
 export async function DELETE(request: Request) {
   try {

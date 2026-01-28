@@ -1,38 +1,39 @@
+/**
+ * Image URL utilities for local storage
+ */
 
-export function isSupabaseStorageUrl(url: string): boolean {
-  return url.includes("supabase.co/storage")
+/**
+ * Get the public URL for an image
+ */
+export function getImageUrl(url: string | null | undefined): string {
+    if (!url) return '/placeholder.svg'
+    
+    // Already a full URL
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+        return url
+    }
+    
+    // Already a local path
+    if (url.startsWith('/')) {
+        return url
+    }
+    
+    // Relative path, make absolute
+    return `/uploads/${url}`
 }
 
-export function getProxyImageUrl(url: string): string {
-  if (!url) return url
-  
-  if (!isSupabaseStorageUrl(url)) {
-    return url
-  }
-
-  const encodedUrl = encodeURIComponent(url)
-  return `/api/admin/images/proxy?url=${encodedUrl}`
+/**
+ * Check if URL is a local storage URL
+ */
+export function isLocalStorageUrl(url: string): boolean {
+    if (!url) return false
+    return url.startsWith('/uploads/')
 }
 
-export function getImageUrl(url: string, useProxy: boolean = true): string {
-  if (!url) return url
-  
-  if (useProxy && isSupabaseStorageUrl(url)) {
-    return getProxyImageUrl(url)
-  }
-  
-  return url
+/**
+ * Transform image URLs in HTML content (no-op for local storage)
+ */
+export function transformHtmlImageUrls(html: string): string {
+    // No transformation needed for local storage
+    return html
 }
-
-
-export function transformHtmlImageUrls(html: string, useProxy: boolean = true): string {
-  if (!html || !useProxy) return html
-
-  const supabaseUrlRegex = /(<img[^>]+src=["'])(https?:\/\/[^"']*supabase\.co\/storage[^"']*)(["'][^>]*>)/gi
-
-  return html.replace(supabaseUrlRegex, (match, prefix, url, suffix) => {
-    const proxyUrl = getProxyImageUrl(url)
-    return `${prefix}${proxyUrl}${suffix}`
-  })
-}
-

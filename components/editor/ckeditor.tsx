@@ -76,12 +76,8 @@ class ApiUploadAdapter {
         const errorMessage = errorData.error || "Không thể tải ảnh lên"
         
         // Handle specific error cases
-        if (errorMessage.includes("Bucket not found") || errorMessage.includes("not found")) {
-          const error = `Bucket '${this.bucket}' chưa được tạo. Vui lòng tạo bucket trong Supabase Dashboard`
-          this.onError?.(error)
-          throw new Error(error)
-        } else if (errorMessage.includes("RLS") || errorMessage.includes("row-level security")) {
-          const error = "Lỗi RLS policy. Vui lòng chạy SQL script trong supabase/migrations/002_storage_policies.sql"
+        if (errorMessage.includes("not found")) {
+          const error = `Thư mục '${this.folder}' chưa được tạo. Vui lòng kiểm tra cấu hình`
           this.onError?.(error)
           throw new Error(error)
         }

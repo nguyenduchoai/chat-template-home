@@ -1,15 +1,8 @@
 /**
- * Storage Utilities
- * Supports both local storage and Supabase storage (for backward compatibility)
+ * Storage Utilities for Local File Storage
  */
 
-import { deleteFile, isSupabaseConfigured } from "@/lib/storage"
-
-// Check if URL is from Supabase storage
-export function isSupabaseStorageUrl(url: string): boolean {
-    if (!url) return false
-    return url.includes('supabase.co/storage') || url.includes('.supabase.co')
-}
+import { deleteFile } from "@/lib/storage"
 
 // Check if URL is from local storage
 export function isLocalStorageUrl(url: string): boolean {
@@ -18,31 +11,10 @@ export function isLocalStorageUrl(url: string): boolean {
 }
 
 export function extractStoragePath(url: string): string | null {
-    // For local storage
-    if (isLocalStorageUrl(url)) {
-        return url.replace(/^\/uploads\//, '')
-    }
-
-    // For Supabase storage
-    if (!isSupabaseStorageUrl(url)) {
+    if (!isLocalStorageUrl(url)) {
         return null
     }
-
-    try {
-        const urlObj = new URL(url)
-        const pathParts = urlObj.pathname.split("/")
-        const bucketIndex = pathParts.indexOf("public")
-        
-        if (bucketIndex === -1 || bucketIndex === pathParts.length - 1) {
-            return null
-        }
-
-        const filePath = pathParts.slice(bucketIndex + 2).join("/")
-        return filePath || null
-    } catch (error) {
-        console.error("Error extracting storage path:", error)
-        return null
-    }
+    return url.replace(/^\/uploads\//, '')
 }
 
 export function extractImageUrlsFromHtml(html: string): string[] {
@@ -54,7 +26,7 @@ export function extractImageUrlsFromHtml(html: string): string[] {
 
     while ((match = imgRegex.exec(html)) !== null) {
         const url = match[1]
-        if (isSupabaseStorageUrl(url) || isLocalStorageUrl(url)) {
+        if (isLocalStorageUrl(url)) {
             imageUrls.push(url)
         }
     }
@@ -64,36 +36,8 @@ export function extractImageUrlsFromHtml(html: string): string[] {
 
 export async function deleteImageFromStorage(url: string): Promise<boolean> {
     try {
-        // Handle local storage
         if (isLocalStorageUrl(url)) {
             return await deleteFile(url)
-        }
-
-        // Handle Supabase storage (only if configured)
-        if (isSupabaseStorageUrl(url) && isSupabaseConfigured()) {
-            const { createSupabaseAdminClient } = await import('@/lib/supabase')
-            const filePath = extractStoragePath(url)
-            if (!filePath) {
-                console.warn("Cannot extract storage path from URL:", url)
-                return false
-            }
-
-            const supabase = createSupabaseAdminClient()
-            if (!supabase) {
-                console.warn("Supabase admin client not available")
-                return false
-            }
-
-            const { error } = await supabase.storage
-                .from("images")
-                .remove([filePath])
-
-            if (error) {
-                console.error("Error deleting image from Supabase storage:", error)
-                return false
-            }
-
-            return true
         }
 
         console.warn("Unknown storage URL type:", url)
@@ -121,7 +65,7 @@ export async function deleteImagesFromStorage(urls: string[]): Promise<number> {
 export async function deletePostImages(coverImage: string | null, content: string | null): Promise<number> {
     const imageUrls: string[] = []
 
-    if (coverImage && (isSupabaseStorageUrl(coverImage) || isLocalStorageUrl(coverImage))) {
+    if (coverImage && isLocalStorageUrl(coverImage)) {
         imageUrls.push(coverImage)
     }
 

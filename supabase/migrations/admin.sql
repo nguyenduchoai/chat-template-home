@@ -1,3 +1,0 @@
-INSERT INTO "public"."User" ("id", "email", "name", "password", "image", "role", "emailVerified", "createdAt", "updatedAt") VALUES ('8f1d824b-f8ed-430b-9879-9c3c1d84d951', 'root@gmail.com', 'Administrator', '$2b$10$azQyxHuI9qwNrFGRPUnHBOxJTJS/lOtyfvdlBcHnIxK/BonumOIW.', null, 'superadmin', null, '2025-11-26 13:20:30.587538', '2025-11-26 13:20:30.587538');
--- ADMIN_EMAIL=root@gmail.com
--- ADMIN_PASSWORD=root123

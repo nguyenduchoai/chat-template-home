@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { requireAdmin } from "@/lib/auth-supabase"
+import { requireAdmin } from "@/lib/auth"
 import { getAllPosts, getPostsPaginated } from "@/lib/db"
 
 export async function GET(request: Request) {

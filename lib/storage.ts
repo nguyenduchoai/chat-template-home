@@ -167,13 +167,6 @@ export async function deleteImage(urlPath: string): Promise<boolean> {
 }
 
 /**
- * Check if Supabase is configured (for backward compat)
- */
-export function isSupabaseConfigured(): boolean {
-    return !!(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
-}
-
-/**
  * Delete a file from storage
  * @param urlPath Public URL path (e.g., /uploads/images/abc.png)
  */

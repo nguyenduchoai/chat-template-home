@@ -2,8 +2,7 @@
 
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { useSupabaseSession } from "@/hooks/useSupabaseSession"
-import { createSupabaseClient } from "@/lib/supabase"
+import { useSession } from "@/hooks/useSession"
 import { Button } from "@/components/ui/button"
 import {
     LayoutDashboard,
@@ -41,12 +40,11 @@ const navigation = [
 export function AdminSidebar() {
     const pathname = usePathname()
     const router = useRouter()
-    const { user } = useSupabaseSession()
-    const supabase = createSupabaseClient()
+    const { user } = useSession()
 
     const handleSignOut = async () => {
-        await supabase.auth.signOut()
-        router.push("/auth/signin")
+        await fetch("/api/auth/signout", { method: "POST" })
+        router.push("/login")
         router.refresh()
     }
 

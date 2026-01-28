@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { requireAdmin } from "@/lib/auth-supabase"
+import { requireAdmin } from "@/lib/auth"
 import { reorderSlides } from "@/lib/db"
 
 export async function POST(request: Request) {

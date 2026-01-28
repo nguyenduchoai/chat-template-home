@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { requireAdmin } from "@/lib/auth-supabase"
+import { requireAdmin } from "@/lib/auth"
 import { getPostById, updatePost, deletePost, checkSlugExists } from "@/lib/db"
 import { deletePostImages, extractImageUrlsFromHtml, deleteImageFromStorage } from "@/lib/storage-utils"
 

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import bcrypt from "bcryptjs"
-import { requireAuth } from "@/lib/auth-supabase"
+import { requireAuth } from "@/lib/auth"
 import { getUserById, updateUser } from "@/lib/db"
 
 export async function PUT(request: Request) {

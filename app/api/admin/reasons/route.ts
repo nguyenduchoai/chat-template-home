@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAllReasons, createReason, reorderReasons } from '@/lib/db'
-import { requireAdmin } from '@/lib/auth-supabase'
+import { requireAdmin } from '@/lib/auth'
 
 export async function GET() {
     try {
