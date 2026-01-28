@@ -5,6 +5,7 @@ import { getPostBySlug } from "@/lib/db"
 import { format } from "date-fns"
 import { vi } from "date-fns/locale"
 import { getImageUrl, transformHtmlImageUrls } from "@/lib/image-utils"
+import { sanitizeAndTransformHtml } from "@/lib/sanitize"
 
 export default async function PostDetailPage({
     params,
@@ -61,7 +62,7 @@ export default async function PostDetailPage({
                     <div
                         className="prose prose-lg dark:prose-invert max-w-none"
                         dangerouslySetInnerHTML={{
-                            __html: transformHtmlImageUrls(post.content)
+                            __html: sanitizeAndTransformHtml(post.content, transformHtmlImageUrls)
                         }}
                     />
                 </article>

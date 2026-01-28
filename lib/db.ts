@@ -1449,7 +1449,6 @@ export async function createContact(contact: {
             })
             .select(CONTACT_COLUMNS)
             .single()
-        console.log(data, error)
 
         if (error || !data) return null
         return mapContact(data)

@@ -10,9 +10,7 @@ export async function GET(
   }
 ) {
   try {
-    console.log("fetching post route", params)
     const { slug } = await params
-    console.log("fetching post", slug)
     const post = await getPostBySlug(slug)
 
     if (!post) {

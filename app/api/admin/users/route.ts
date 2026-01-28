@@ -81,7 +81,6 @@ export async function POST(request: Request) {
     } catch (error: any) {
         const message = error?.message || "Failed to create user"
         const status = message.includes("Email đã tồn tại") ? 409 : 500
-        console.log(message, status, 'message, status')
         return NextResponse.json({ error: message }, { status })
     }
 }

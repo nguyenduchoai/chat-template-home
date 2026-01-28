@@ -12,11 +12,8 @@ export async function GET(
 
         // Handle params as Promise (Next.js 15) or object (Next.js 14)
         const resolvedParams = params instanceof Promise ? await params : params
-        console.log("Fetching post with id:", resolvedParams.id)
 
         const post = await getPostById(resolvedParams.id)
-
-        console.log("Post found:", post ? "yes" : "no")
 
         if (!post) {
             return NextResponse.json(
@@ -111,7 +108,6 @@ export async function PUT(
                     deletedCount++
                 }
             }
-            console.log(`Deleted ${deletedCount} unused image(s) from storage`)
         }
         const post = await updatePost(resolvedParams.id, updateData)
 
@@ -166,8 +162,6 @@ export async function DELETE(
             post.coverImage || null,
             post.content
         )
-        
-        console.log(`Deleted ${deletedImagesCount} image(s) from storage`)
 
         const success = await deletePost(resolvedParams.id)
 

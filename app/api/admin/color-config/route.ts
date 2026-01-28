@@ -66,11 +66,9 @@ export async function POST(request: Request) {
 
 export async function PUT(request: Request) {
     try {
-        const user = await requireAdmin()
-        console.log("User:", user.email, "Role:", user.role)
+        await requireAdmin()
         
         const payload = await request.json()
-        console.log("Payload received:", payload)
 
         if (!Array.isArray(payload)) {
             return NextResponse.json(
