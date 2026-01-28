@@ -76,6 +76,11 @@ export interface SiteInfo {
     showFeatures?: boolean
     showReasons?: boolean
     showPosts?: boolean
+    // Bizino AI Chat Configuration
+    chatEnabled?: boolean
+    chatAssistantId?: string | null
+    chatApiUrl?: string | null
+    chatApiKey?: string | null
     updatedAt: Date
     updatedBy?: string | null
 }

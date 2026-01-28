@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { getSiteInfoRecord } from "@/lib/db";
 
 export async function POST(req: Request) {
     try {
@@ -12,8 +13,28 @@ export async function POST(req: Request) {
             );
         }
 
+        // Get chat config from database
+        const siteInfo = await getSiteInfoRecord();
+        const chatApiUrl = siteInfo?.chatApiUrl || process.env.NEXT_PUBLIC_BIZINO_API || process.env.NEXT_PUBLIC_IA_BASE_URL;
+        const chatAssistantId = siteInfo?.chatAssistantId || process.env.NEXT_PUBLIC_BIZINO_BOT_UUID || process.env.NEXT_PUBLIC_IA_ASSISTANT_ID;
+        
+        if (!chatApiUrl || !chatAssistantId) {
+            return NextResponse.json(
+                { message: "Chat không được cấu hình. Vui lòng cấu hình trong Admin > Cài đặt" },
+                { status: 503 }
+            );
+        }
+
+        // Check if chat is enabled
+        if (siteInfo?.chatEnabled === false) {
+            return NextResponse.json(
+                { message: "Chat đã tạm thời đóng" },
+                { status: 503 }
+            );
+        }
+
         const threadId = req.headers.get("cookie")
-            ?.split("; ")
+            ?.split(/;\s*/)
             .find((c) => c.startsWith("thread_id="))
             ?.split("=")[1];
 
@@ -32,12 +53,12 @@ export async function POST(req: Request) {
         }
 
         const response = await fetch(
-            `${process.env.NEXT_PUBLIC_BIZINO_API}/botChat/chat`,
+            `${chatApiUrl}/botChat/chat`,
             {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    bot_uuid: process.env.NEXT_PUBLIC_BIZINO_BOT_UUID,
+                    bot_uuid: chatAssistantId,
                     channel_id: "web",
                     environment: "prod",
                     message: body.message,

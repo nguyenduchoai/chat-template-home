@@ -46,6 +46,11 @@ interface SettingsState {
     showFeatures: boolean
     showReasons: boolean
     showPosts: boolean
+    // Bizino AI Chat Configuration
+    chatEnabled: boolean
+    chatAssistantId: string
+    chatApiUrl: string
+    chatApiKey: string
 }
 
 const DEFAULT_SETTINGS: SettingsState = {
@@ -80,15 +85,21 @@ const DEFAULT_SETTINGS: SettingsState = {
     showFeatures: true,
     showReasons: true,
     showPosts: true,
+    // Bizino AI Chat defaults
+    chatEnabled: true,
+    chatAssistantId: "",
+    chatApiUrl: "https://chat.bizino.ai/api",
+    chatApiKey: "",
 }
 
 type StringSettingsKey = 'siteUrl' | 'title' | 'name' | 'logo' | 'description' | 'keywords' | 
     'bannerTitle' | 'bannerDescription' | 'featuresTitle' | 'featuresDescription' |
     'reasonsTitle' | 'reasonsDescription' | 'author' | 'email' | 'phone' |
     'facebook' | 'instagram' | 'twitter' | 'linkedin' | 'youtube' | 'tiktok' |
+    'chatAssistantId' | 'chatApiUrl' | 'chatApiKey' |
     'address' | 'contact' | 'ogImage' | 'ogType' | 'twitterCard'
 
-type BooleanSettingsKey = 'showSlides' | 'showBanner' | 'showFeatures' | 'showReasons' | 'showPosts'
+type BooleanSettingsKey = 'showSlides' | 'showBanner' | 'showFeatures' | 'showReasons' | 'showPosts' | 'chatEnabled'
 
 const SOCIAL_FIELDS: StringSettingsKey[] = ["facebook", "instagram", "twitter", "linkedin", "youtube", "tiktok"]
 
@@ -143,7 +154,8 @@ export default function AdminSettingsPage() {
                     'bannerTitle', 'bannerDescription', 'featuresTitle', 'featuresDescription',
                     'reasonsTitle', 'reasonsDescription', 'author', 'email', 'phone',
                     'facebook', 'instagram', 'twitter', 'linkedin', 'youtube', 'tiktok',
-                    'address', 'contact', 'ogImage', 'ogType', 'twitterCard'
+                    'address', 'contact', 'ogImage', 'ogType', 'twitterCard',
+                    'chatAssistantId', 'chatApiUrl', 'chatApiKey'
                 ]
                 stringFields.forEach(key => {
                     next[key] = data?.[key] ?? ""
@@ -151,7 +163,7 @@ export default function AdminSettingsPage() {
                 
                 // Handle boolean fields
                 const booleanFields: BooleanSettingsKey[] = [
-                    'showSlides', 'showBanner', 'showFeatures', 'showReasons', 'showPosts'
+                    'showSlides', 'showBanner', 'showFeatures', 'showReasons', 'showPosts', 'chatEnabled'
                 ]
                 booleanFields.forEach(key => {
                     next[key] = data?.[key] !== false && data?.[key] !== 0
@@ -255,6 +267,49 @@ export default function AdminSettingsPage() {
                                     checked={settings.showPosts}
                                     onCheckedChange={handleToggle('showPosts')}
                                 />
+                            </CardContent>
+                        </Card>
+
+                        {/* Bizino AI Chat Configuration */}
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>🤖 Cấu hình Bizino AI Chat</CardTitle>
+                                <CardDescription>Cấu hình chatbot AI tích hợp trên website</CardDescription>
+                            </CardHeader>
+                            <CardContent className="space-y-4">
+                                <ToggleItem
+                                    label="Bật Chatbot"
+                                    description="Hiển thị chatbox Bizino AI trên website"
+                                    checked={settings.chatEnabled}
+                                    onCheckedChange={handleToggle('chatEnabled')}
+                                />
+                                <InputDiv>
+                                    <label className="text-sm font-medium">Assistant ID *</label>
+                                    <Input 
+                                        value={settings.chatAssistantId} 
+                                        onChange={handleChange("chatAssistantId")} 
+                                        placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+                                    />
+                                    <p className="text-xs text-muted-foreground">ID của Bot trong Bizino Dashboard</p>
+                                </InputDiv>
+                                <InputDiv>
+                                    <label className="text-sm font-medium">API URL</label>
+                                    <Input 
+                                        value={settings.chatApiUrl} 
+                                        onChange={handleChange("chatApiUrl")} 
+                                        placeholder="https://chat.bizino.ai/api"
+                                    />
+                                </InputDiv>
+                                <InputDiv>
+                                    <label className="text-sm font-medium">API Key</label>
+                                    <Input 
+                                        type="password"
+                                        value={settings.chatApiKey} 
+                                        onChange={handleChange("chatApiKey")} 
+                                        placeholder="Nhập API key (nếu có)"
+                                    />
+                                    <p className="text-xs text-muted-foreground">Để trống nếu không yêu cầu xác thực</p>
+                                </InputDiv>
                             </CardContent>
                         </Card>
 

@@ -1,17 +1,36 @@
 import { NextResponse } from "next/server";
 import { v4 as uuidv4 } from "uuid";
+import { getSiteInfoRecord } from "@/lib/db";
 
 export async function POST(req: Request) {
     try {
         const { isReset } = await req.json();
         
+        // Get chat config from database
+        const siteInfo = await getSiteInfoRecord();
+        const chatApiUrl = siteInfo?.chatApiUrl || process.env.NEXT_PUBLIC_BIZINO_API || process.env.NEXT_PUBLIC_IA_BASE_URL;
+        const chatAssistantId = siteInfo?.chatAssistantId || process.env.NEXT_PUBLIC_BIZINO_BOT_UUID || process.env.NEXT_PUBLIC_IA_ASSISTANT_ID;
+        
+        if (!chatApiUrl || !chatAssistantId) {
+            return NextResponse.json(
+                { message: "Chat không được cấu hình. Vui lòng cấu hình trong Admin > Cài đặt" },
+                { status: 503 }
+            );
+        }
+
+        // Check if chat is enabled
+        if (siteInfo?.chatEnabled === false) {
+            return NextResponse.json(
+                { message: "Chat đã tạm thời đóng" },
+                { status: 503 }
+            );
+        }
+        
         // Safari-compatible cookie parsing
-        // Safari may format cookies differently (with or without spaces)
         let threadId: string | undefined;
         const cookieHeader = req.headers.get("cookie");
         
         if (cookieHeader) {
-            // Handle both "; " and ";" separators (Safari compatibility)
             const cookies = cookieHeader.split(/;\s*/);
             const threadCookie = cookies.find((c) => c.trim().startsWith("thread_id="));
             if (threadCookie) {
@@ -22,13 +41,14 @@ export async function POST(req: Request) {
         if (!threadId || isReset) {
             threadId = uuidv4();
         }
+        
         const response = await fetch(
-            `${process.env.NEXT_PUBLIC_BIZINO_API}/botChat/startChat`,
+            `${chatApiUrl}/botChat/startChat`,
             {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    bot_uuid: process.env.NEXT_PUBLIC_BIZINO_BOT_UUID,
+                    bot_uuid: chatAssistantId,
                     thread_id: threadId,
                     channel_id: "web",
                     environment: "prod",
@@ -44,10 +64,9 @@ export async function POST(req: Request) {
         res.cookies.set("thread_id", threadId, {
             httpOnly: true,
             maxAge: 60 * 60 * 24 * 7, // 7 days
-            sameSite: "lax", // Safari-compatible - allows cookie in same-site requests
-            secure: isProduction, // Only secure in production (HTTPS)
-            path: "/", // Ensure cookie is available across the site
-            // Don't set domain to allow subdomain access if needed
+            sameSite: "lax",
+            secure: isProduction,
+            path: "/",
         });
 
         return res;

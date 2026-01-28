@@ -82,6 +82,11 @@ CREATE TABLE IF NOT EXISTS `SiteInfo` (
     `showFeatures` TINYINT(1) NOT NULL DEFAULT 1,
     `showReasons` TINYINT(1) NOT NULL DEFAULT 1,
     `showPosts` TINYINT(1) NOT NULL DEFAULT 1,
+    -- Bizino AI Chatbot Configuration
+    `chatEnabled` TINYINT(1) NOT NULL DEFAULT 1,
+    `chatAssistantId` VARCHAR(255),
+    `chatApiUrl` VARCHAR(500) DEFAULT 'https://chat.bizino.ai/api',
+    `chatApiKey` VARCHAR(500),
     `updatedAt` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     `updatedBy` VARCHAR(36),
     FOREIGN KEY (`updatedBy`) REFERENCES `User`(`id`) ON DELETE SET NULL
