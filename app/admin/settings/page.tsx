@@ -46,6 +46,8 @@ interface SettingsState {
     chatApiUrl: string
     chatApiKey: string
     chatInputPlaceholder: string
+    homeTitleSize: string
+    homeDescriptionSize: string
 }
 
 const DEFAULT_SETTINGS: SettingsState = {
@@ -80,13 +82,16 @@ const DEFAULT_SETTINGS: SettingsState = {
     chatApiUrl: "https://chat.bizino.ai/api",
     chatApiKey: "",
     chatInputPlaceholder: "Hỏi bất cứ điều gì về AI...",
+    homeTitleSize: "6xl",
+    homeDescriptionSize: "xl",
 }
 
 type StringSettingsKey = 'siteUrl' | 'title' | 'name' | 'logo' | 'description' | 'keywords' | 
     'bannerTitle' | 'bannerDescription' | 'author' | 'email' | 'phone' |
     'facebook' | 'instagram' | 'twitter' | 'linkedin' | 'youtube' | 'tiktok' |
     'chatAssistantId' | 'chatApiUrl' | 'chatApiKey' | 'chatInputPlaceholder' |
-    'address' | 'contact' | 'ogImage' | 'ogType' | 'twitterCard'
+    'address' | 'contact' | 'ogImage' | 'ogType' | 'twitterCard' |
+    'homeTitleSize' | 'homeDescriptionSize'
 
 type BooleanSettingsKey = 'showSlides' | 'showBanner' | 'showPosts' | 'chatEnabled'
 
@@ -143,7 +148,8 @@ export default function AdminSettingsPage() {
                     'bannerTitle', 'bannerDescription', 'author', 'email', 'phone',
                     'facebook', 'instagram', 'twitter', 'linkedin', 'youtube', 'tiktok',
                     'address', 'contact', 'ogImage', 'ogType', 'twitterCard',
-                    'chatAssistantId', 'chatApiUrl', 'chatApiKey', 'chatInputPlaceholder'
+                    'chatAssistantId', 'chatApiUrl', 'chatApiKey', 'chatInputPlaceholder',
+                    'homeTitleSize', 'homeDescriptionSize'
                 ]
                 stringFields.forEach(key => {
                     next[key] = data?.[key] ?? ""
@@ -346,10 +352,41 @@ export default function AdminSettingsPage() {
                                     <label className="text-sm font-medium">Tiêu đề Banner</label>
                                     <Input value={settings.bannerTitle} onChange={handleChange("bannerTitle")} placeholder="Trải nghiệm AI thông minh" />
                                 </InputDiv>
+                                <InputDiv>
+                                    <label className="text-sm font-medium">Kích thước tiêu đề</label>
+                                    <select 
+                                        value={settings.homeTitleSize} 
+                                        onChange={(e) => setSettings(prev => ({ ...prev, homeTitleSize: e.target.value }))}
+                                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                                    >
+                                        <option value="4xl">4xl (36px)</option>
+                                        <option value="5xl">5xl (48px)</option>
+                                        <option value="6xl">6xl (60px) - Mặc định</option>
+                                        <option value="7xl">7xl (72px)</option>
+                                        <option value="8xl">8xl (96px)</option>
+                                        <option value="9xl">9xl (128px)</option>
+                                    </select>
+                                    <p className="text-xs text-muted-foreground">Kích thước tiêu đề lớn trên trang chủ</p>
+                                </InputDiv>
                                 <div className="space-y-2">
                                     <label className="text-sm font-medium">Mô tả Banner</label>
                                     <Textarea value={settings.bannerDescription} onChange={handleChange("bannerDescription")} rows={3} placeholder="Khám phá sức mạnh..." />
                                 </div>
+                                <InputDiv>
+                                    <label className="text-sm font-medium">Kích thước mô tả</label>
+                                    <select 
+                                        value={settings.homeDescriptionSize} 
+                                        onChange={(e) => setSettings(prev => ({ ...prev, homeDescriptionSize: e.target.value }))}
+                                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                                    >
+                                        <option value="base">base (16px)</option>
+                                        <option value="lg">lg (18px)</option>
+                                        <option value="xl">xl (20px) - Mặc định</option>
+                                        <option value="2xl">2xl (24px)</option>
+                                        <option value="3xl">3xl (30px)</option>
+                                    </select>
+                                    <p className="text-xs text-muted-foreground">Kích thước mô tả trên trang chủ</p>
+                                </InputDiv>
                             </CardContent>
                         </Card>
 
