@@ -106,14 +106,12 @@ export default function SlideShow() {
                                 <SlideContent slide={slide}>
                                     <div className="relative w-full">
                                         <div className="relative w-full">
-                                            <Image
+                                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                                            <img
                                                 src={getImageUrl(slide.image)}
                                                 alt={slide.title}
-                                                width={1920}
-                                                height={1080}
                                                 className="w-full h-auto object-contain"
-                                                priority={index === 0}
-                                                sizes="100vw"
+                                                loading={index === 0 ? "eager" : "lazy"}
                                                 style={{
                                                     width: '100%',
                                                     height: 'auto',
