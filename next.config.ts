@@ -2,13 +2,9 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
-    // Local upload patterns
-    localPatterns: [
-      {
-        pathname: "/uploads/**",
-      },
-    ],
-    unoptimized: false,
+    // For self-hosted VPS, disable image optimization to avoid issues
+    // Images are served directly from /uploads/ via Nginx
+    unoptimized: true,
   },
   // Tắt source map trong dev mode để tránh lỗi source map
   productionBrowserSourceMaps: false,
