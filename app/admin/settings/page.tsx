@@ -22,10 +22,6 @@ interface SettingsState {
     keywords: string
     bannerTitle: string
     bannerDescription: string
-    featuresTitle: string
-    featuresDescription: string
-    reasonsTitle: string
-    reasonsDescription: string
     author: string
     email: string
     phone: string
@@ -43,14 +39,13 @@ interface SettingsState {
     // Section visibility toggles
     showSlides: boolean
     showBanner: boolean
-    showFeatures: boolean
-    showReasons: boolean
     showPosts: boolean
     // Bizino AI Chat Configuration
     chatEnabled: boolean
     chatAssistantId: string
     chatApiUrl: string
     chatApiKey: string
+    chatInputPlaceholder: string
 }
 
 const DEFAULT_SETTINGS: SettingsState = {
@@ -62,10 +57,6 @@ const DEFAULT_SETTINGS: SettingsState = {
     keywords: "",
     bannerTitle: "",
     bannerDescription: "",
-    featuresTitle: "",
-    featuresDescription: "",
-    reasonsTitle: "",
-    reasonsDescription: "",
     author: "",
     email: "",
     phone: "",
@@ -82,24 +73,22 @@ const DEFAULT_SETTINGS: SettingsState = {
     twitterCard: "",
     showSlides: true,
     showBanner: true,
-    showFeatures: true,
-    showReasons: true,
     showPosts: true,
     // Bizino AI Chat defaults
     chatEnabled: true,
     chatAssistantId: "",
     chatApiUrl: "https://chat.bizino.ai/api",
     chatApiKey: "",
+    chatInputPlaceholder: "Hỏi bất cứ điều gì về AI...",
 }
 
 type StringSettingsKey = 'siteUrl' | 'title' | 'name' | 'logo' | 'description' | 'keywords' | 
-    'bannerTitle' | 'bannerDescription' | 'featuresTitle' | 'featuresDescription' |
-    'reasonsTitle' | 'reasonsDescription' | 'author' | 'email' | 'phone' |
+    'bannerTitle' | 'bannerDescription' | 'author' | 'email' | 'phone' |
     'facebook' | 'instagram' | 'twitter' | 'linkedin' | 'youtube' | 'tiktok' |
-    'chatAssistantId' | 'chatApiUrl' | 'chatApiKey' |
+    'chatAssistantId' | 'chatApiUrl' | 'chatApiKey' | 'chatInputPlaceholder' |
     'address' | 'contact' | 'ogImage' | 'ogType' | 'twitterCard'
 
-type BooleanSettingsKey = 'showSlides' | 'showBanner' | 'showFeatures' | 'showReasons' | 'showPosts' | 'chatEnabled'
+type BooleanSettingsKey = 'showSlides' | 'showBanner' | 'showPosts' | 'chatEnabled'
 
 const SOCIAL_FIELDS: StringSettingsKey[] = ["facebook", "instagram", "twitter", "linkedin", "youtube", "tiktok"]
 
@@ -151,11 +140,10 @@ export default function AdminSettingsPage() {
                 // Handle string fields
                 const stringFields: StringSettingsKey[] = [
                     'siteUrl', 'title', 'name', 'logo', 'description', 'keywords',
-                    'bannerTitle', 'bannerDescription', 'featuresTitle', 'featuresDescription',
-                    'reasonsTitle', 'reasonsDescription', 'author', 'email', 'phone',
+                    'bannerTitle', 'bannerDescription', 'author', 'email', 'phone',
                     'facebook', 'instagram', 'twitter', 'linkedin', 'youtube', 'tiktok',
                     'address', 'contact', 'ogImage', 'ogType', 'twitterCard',
-                    'chatAssistantId', 'chatApiUrl', 'chatApiKey'
+                    'chatAssistantId', 'chatApiUrl', 'chatApiKey', 'chatInputPlaceholder'
                 ]
                 stringFields.forEach(key => {
                     next[key] = data?.[key] ?? ""
@@ -163,7 +151,7 @@ export default function AdminSettingsPage() {
                 
                 // Handle boolean fields
                 const booleanFields: BooleanSettingsKey[] = [
-                    'showSlides', 'showBanner', 'showFeatures', 'showReasons', 'showPosts', 'chatEnabled'
+                    'showSlides', 'showBanner', 'showPosts', 'chatEnabled'
                 ]
                 booleanFields.forEach(key => {
                     next[key] = data?.[key] !== false && data?.[key] !== 0
@@ -250,18 +238,6 @@ export default function AdminSettingsPage() {
                                     onCheckedChange={handleToggle('showBanner')}
                                 />
                                 <ToggleItem
-                                    label="Tính năng"
-                                    description="Section các tính năng nổi bật"
-                                    checked={settings.showFeatures}
-                                    onCheckedChange={handleToggle('showFeatures')}
-                                />
-                                <ToggleItem
-                                    label="Số liệu/Lý do"
-                                    description="Section số liệu ấn tượng (45 KHÁCH...)"
-                                    checked={settings.showReasons}
-                                    onCheckedChange={handleToggle('showReasons')}
-                                />
-                                <ToggleItem
                                     label="Bài viết"
                                     description="Danh sách bài viết mới nhất"
                                     checked={settings.showPosts}
@@ -309,6 +285,15 @@ export default function AdminSettingsPage() {
                                         placeholder="Nhập API key (nếu có)"
                                     />
                                     <p className="text-xs text-muted-foreground">Để trống nếu không yêu cầu xác thực</p>
+                                </InputDiv>
+                                <InputDiv>
+                                    <label className="text-sm font-medium">Placeholder text nhập câu hỏi</label>
+                                    <Input 
+                                        value={settings.chatInputPlaceholder} 
+                                        onChange={handleChange("chatInputPlaceholder")} 
+                                        placeholder="Hỏi bất cứ điều gì về AI..."
+                                    />
+                                    <p className="text-xs text-muted-foreground">Text hiển thị trong ô nhập câu hỏi ở footer</p>
                                 </InputDiv>
                             </CardContent>
                         </Card>
@@ -368,39 +353,6 @@ export default function AdminSettingsPage() {
                             </CardContent>
                         </Card>
 
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>Section Tính năng</CardTitle>
-                                <CardDescription>Tiêu đề và mô tả section các tính năng</CardDescription>
-                            </CardHeader>
-                            <CardContent className="space-y-4">
-                                <InputDiv>
-                                    <label className="text-sm font-medium">Tiêu đề</label>
-                                    <Input value={settings.featuresTitle} onChange={handleChange("featuresTitle")} placeholder="Tại sao chọn AI nha khoa?" />
-                                </InputDiv>
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium">Mô tả</label>
-                                    <Textarea value={settings.featuresDescription} onChange={handleChange("featuresDescription")} rows={2} placeholder="Nền tảng AI..." />
-                                </div>
-                            </CardContent>
-                        </Card>
-
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>Section Lý do chọn</CardTitle>
-                                <CardDescription>Tiêu đề và mô tả section số liệu (45 KHÁCH, 98%, 99%...)</CardDescription>
-                            </CardHeader>
-                            <CardContent className="space-y-4">
-                                <InputDiv>
-                                    <label className="text-sm font-medium">Tiêu đề</label>
-                                    <Input value={settings.reasonsTitle} onChange={handleChange("reasonsTitle")} placeholder="Số liệu ấn tượng" />
-                                </InputDiv>
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium">Mô tả</label>
-                                    <Textarea value={settings.reasonsDescription} onChange={handleChange("reasonsDescription")} rows={2} placeholder="Những con số chứng minh..." />
-                                </div>
-                            </CardContent>
-                        </Card>
 
                         <Card>
                             <CardHeader>

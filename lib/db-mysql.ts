@@ -81,6 +81,7 @@ export interface SiteInfo {
     chatAssistantId?: string | null
     chatApiUrl?: string | null
     chatApiKey?: string | null
+    chatInputPlaceholder?: string | null
     updatedAt: Date
     updatedBy?: string | null
 }

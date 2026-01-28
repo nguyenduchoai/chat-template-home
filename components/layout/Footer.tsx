@@ -6,15 +6,19 @@ import { Button } from "@/components/ui/button"
 import { MessageSquare, Send } from "lucide-react"
 import { useState, useEffect, useRef } from "react"
 import { convertColorForCSS } from "@/lib/color-utils"
+import { useSiteInfo } from "@/components/providers/SiteInfoProvider"
 
 export default function ChatBar() {
     const [query, setQuery] = useState("")
     const pathname = usePathname()
+    const siteInfo = useSiteInfo()
 
     // Ẩn ở trang tro-chuyen và các trang admin
     if (pathname?.startsWith("/tro-chuyen") || pathname?.startsWith("/admin")) {
         return null
     }
+
+    const placeholder = siteInfo?.chatInputPlaceholder || "Hỏi bất cứ điều gì về AI..."
 
     return (
 
@@ -30,7 +34,7 @@ export default function ChatBar() {
                             <MessageSquare className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground flex-shrink-0" />
                             <input
                                 type="text"
-                                placeholder="Hỏi bất cứ điều gì về AI..."
+                                placeholder={placeholder}
                                 value={query}
                                 onChange={(e) => setQuery(e.target.value)}
                                 onKeyDown={(e) => {

@@ -38,6 +38,7 @@ export interface SiteInfo {
   featuresDescription?: string
   reasonsTitle?: string
   reasonsDescription?: string
+  chatInputPlaceholder?: string
 }
 
 // Server-side: Get from database

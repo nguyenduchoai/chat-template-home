@@ -84,16 +84,6 @@ const data = {
       url: "/admin/slides",
       icon: IconPhoto,
     },
-    {
-      name: "Tính năng",
-      url: "/admin/features",
-      icon: IconFileDescription,
-    },
-    {
-      name: "Lý do chọn",
-      url: "/admin/reasons",
-      icon: IconFileDescription,
-    },
   ],
 }
 
