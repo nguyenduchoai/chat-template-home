@@ -6,7 +6,7 @@ import { useState, useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Send, Square, MessageCircle } from "lucide-react"
 import { cn } from "@/lib/utils"
-import Image from "next/image"
+import Image from "@/components/ui/image"
 
 interface ChatInputProps {
     onSend?: (message: string, files?: File[]) => void

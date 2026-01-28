@@ -6,7 +6,7 @@ import { useSession } from "@/hooks/useSession"
 import { Button } from "@/components/ui/button"
 import { MessageSquare, User, LogOut, BookOpen, Phone, Menu, X } from "lucide-react"
 import { useSiteInfo } from "@/components/providers/SiteInfoProvider"
-import Image from "next/image"
+import Image from "@/components/ui/image"
 import { useState } from "react"
 import {
     Sheet,

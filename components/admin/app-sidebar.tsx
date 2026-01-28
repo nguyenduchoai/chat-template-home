@@ -29,7 +29,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import { useSiteInfo } from "@/components/providers/SiteInfoProvider"
-import Image from "next/image"
+import Image from "@/components/ui/image"
 import Link from "next/link"
 import { NavDocuments } from "./nav-documents"
 

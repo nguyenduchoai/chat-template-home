@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { notFound } from "next/navigation"
-import Image from "next/image"
+import Image from "@/components/ui/image"
 import { getPostBySlug } from "@/lib/db"
 import { format } from "date-fns"
 import { vi } from "date-fns/locale"
