@@ -5,13 +5,12 @@
   "scripts": {
     "dev": "next dev --webpack",
     "build": "next build",
-    "postbuild": "npm run init-admin",
     "start": "next start",
     "lint": "eslint",
-    "init-admin": "tsx scripts/init-admin.ts",
-    "migrate": "tsx scripts/migrate-db.ts",
-    "seed": "tsx scripts/seed-db.ts",
-    "create-user": "tsx scripts/create-supabase-user.ts"
+    "init-admin": "tsx scripts/init-admin-mysql.ts",
+    "export-data": "tsx scripts/export-supabase-data.ts",
+    "import-data": "tsx scripts/import-to-mysql.ts",
+    "deploy": "bash scripts/deploy.sh"
   },
   "dependencies": {
     "@ckeditor/ckeditor5-build-classic": "^41.4.2",
@@ -46,7 +45,9 @@
     "dompurify": "^3.3.1",
     "dotenv": "^17.2.3",
     "framer-motion": "^12.23.24",
+    "jose": "^6.1.3",
     "lucide-react": "^0.553.0",
+    "mysql2": "^3.16.2",
     "next": "^16.1.6",
     "next-themes": "^0.4.6",
     "react": "^19.2.4",

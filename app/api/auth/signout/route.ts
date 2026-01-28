@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server'
-import { createSupabaseServerClient } from '@/lib/supabase'
+import { clearAuthCookie } from '@/lib/auth'
 
 export async function POST() {
     try {
-        const supabase = await createSupabaseServerClient()
-        await supabase.auth.signOut()
+        // Clear the auth cookie
+        await clearAuthCookie()
 
         return NextResponse.json({ success: true })
     } catch (error) {
@@ -15,4 +15,3 @@ export async function POST() {
         )
     }
 }
-

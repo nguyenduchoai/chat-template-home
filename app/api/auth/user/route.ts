@@ -1,31 +1,18 @@
 import { NextResponse } from 'next/server'
-import { createUser, getUserByEmail } from '@/lib/db'
-import { createSupabaseServerClient } from '@/lib/supabase'
-import bcrypt from 'bcryptjs'
-import { requireSuperadmin } from '@/lib/auth-supabase'
+import { getSession } from '@/lib/auth'
+import { getUserByEmail } from '@/lib/db-mysql'
 
-export async function GET(request: Request) {
+export async function GET() {
     try {
-        const { searchParams } = new URL(request.url)
-        const email = searchParams.get('email')
+        // Get session from JWT cookie
+        const session = await getSession()
 
-        // Verify Supabase session
-        const supabase = await createSupabaseServerClient()
-        const {
-            data: { user: supabaseUser },
-        } = await supabase.auth.getUser()
-
-        if (!supabaseUser) {
+        if (!session) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
         }
 
-        // If email provided, verify it matches the session user
-        if (email && email !== supabaseUser.email) {
-            return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-        }
-
-        // Get user from database
-        const dbUser = await getUserByEmail(supabaseUser.email!)
+        // Get fresh user data from database
+        const dbUser = await getUserByEmail(session.email)
 
         if (!dbUser) {
             return NextResponse.json({ error: 'User not found' }, { status: 404 })

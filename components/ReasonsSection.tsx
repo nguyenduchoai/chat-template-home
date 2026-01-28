@@ -1,6 +1,5 @@
 "use client"
 
-import { getActiveReasons, getSiteInfoRecord } from '@/lib/db'
 import { cn } from '@/lib/utils'
 import { convertColorForCSS } from '@/lib/color-utils'
 import { useEffect, useState } from 'react'
@@ -8,14 +7,29 @@ import { useEffect, useState } from 'react'
 const FALLBACK_TITLE = 'Số liệu ấn tượng'
 const FALLBACK_DESCRIPTION = 'Những con số chứng minh chất lượng dịch vụ của chúng tôi'
 
+interface Reason {
+    id: string
+    icon: string
+    title: string
+    description: string
+    order: number
+    active: boolean
+}
+
 export default function ReasonsSection() {
-    const [reasons, setReasons] = useState<any[]>([])
+    const [reasons, setReasons] = useState<Reason[]>([])
     const [siteInfo, setSiteInfo] = useState<any>(null)
 
     useEffect(() => {
-        Promise.all([getActiveReasons(), getSiteInfoRecord()]).then(([reasonsData, info]) => {
-            setReasons(reasonsData)
+        // Fetch reasons and site info via API
+        Promise.all([
+            fetch('/api/public/reasons').then(res => res.json()),
+            fetch('/api/public/site-info').then(res => res.json())
+        ]).then(([reasonsData, info]) => {
+            setReasons(reasonsData || [])
             setSiteInfo(info)
+        }).catch(err => {
+            console.error('Error fetching reasons:', err)
         })
     }, [])
 

@@ -1,21 +1,35 @@
 "use client"
 
 import Image from 'next/image'
-import { getActiveFeatures, getSiteInfoRecord } from '@/lib/db'
 import { convertColorForCSS } from '@/lib/color-utils'
 import { useEffect, useState } from 'react'
 
 const FALLBACK_TITLE = 'Tại sao chọn AI nha khoa?'
 const FALLBACK_DESCRIPTION = 'Nền tảng AI cơ mối phần khoa, tư vấn chăm sóc răng miệng từ đội ngũ bác sĩ chuyên môn'
 
+interface Feature {
+    id: string
+    icon: string
+    title: string
+    description: string
+    order: number
+    active: boolean
+}
+
 export default function FeaturesSection() {
-    const [features, setFeatures] = useState<any[]>([])
+    const [features, setFeatures] = useState<Feature[]>([])
     const [siteInfo, setSiteInfo] = useState<any>(null)
 
     useEffect(() => {
-        Promise.all([getActiveFeatures(), getSiteInfoRecord()]).then(([feats, info]) => {
-            setFeatures(feats)
+        // Fetch features and site info via API
+        Promise.all([
+            fetch('/api/public/features').then(res => res.json()),
+            fetch('/api/public/site-info').then(res => res.json())
+        ]).then(([feats, info]) => {
+            setFeatures(feats || [])
             setSiteInfo(info)
+        }).catch(err => {
+            console.error('Error fetching features:', err)
         })
     }, [])
 
