@@ -9,6 +9,12 @@ const FALLBACK_SITE_INFO = {
     author: "AI Platform",
     bannerTitle: "Trải nghiệm AI thông minh",
     bannerDescription: "Khám phá sức mạnh của trí tuệ nhân tạo với công cụ chat tiên tiến.",
+    // Default visibility toggles
+    showSlides: true,
+    showBanner: true,
+    showFeatures: true,
+    showReasons: true,
+    showPosts: true,
 }
 
 export async function GET() {

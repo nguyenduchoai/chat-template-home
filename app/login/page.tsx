@@ -2,7 +2,6 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { createSupabaseClient } from "@/lib/supabase"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -13,7 +12,6 @@ export default function SignInPage() {
     const [password, setPassword] = useState("")
     const [error, setError] = useState("")
     const [loading, setLoading] = useState(false)
-    const supabase = createSupabaseClient()
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -21,25 +19,21 @@ export default function SignInPage() {
         setLoading(true)
 
         try {
-            const { data, error: supabaseError } = await supabase.auth.signInWithPassword({
-                email,
-                password,
+            // Call JWT-based signin API
+            const res = await fetch("/api/auth/signin", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, password }),
             })
 
-            if (supabaseError) {
-                if (supabaseError.message?.includes('Invalid login credentials') || supabaseError.code === 'invalid_credentials') {
-                    setError("Email hoặc mật khẩu không đúng. Nếu bạn chưa có tài khoản")
-                } else {
-                    setError(supabaseError.message || "Email hoặc mật khẩu không đúng")
-                }
+            const data = await res.json()
+
+            if (!res.ok) {
+                setError(data.error || "Email hoặc mật khẩu không đúng")
                 return
             }
 
-            if (!data.user) {
-                setError("Đăng nhập thất bại. Vui lòng thử lại.")
-                return
-            }
-
+            // Get user info and redirect based on role
             try {
                 const userRes = await fetch("/api/auth/user")
                 if (userRes.ok) {
@@ -118,4 +112,3 @@ export default function SignInPage() {
         </div>
     )
 }
-

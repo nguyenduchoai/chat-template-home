@@ -10,8 +10,45 @@ import { useToast } from "@/components/ui/toast"
 import { ImageUpload } from "@/components/editor/image-upload"
 import { cn } from "@/lib/utils"
 import { Spinner } from "@/components/ui/spinner"
+import { Switch } from "@/components/ui/switch"
+import { Label } from "@/components/ui/label"
 
-const DEFAULT_SETTINGS = {
+interface SettingsState {
+    siteUrl: string
+    title: string
+    name: string
+    logo: string
+    description: string
+    keywords: string
+    bannerTitle: string
+    bannerDescription: string
+    featuresTitle: string
+    featuresDescription: string
+    reasonsTitle: string
+    reasonsDescription: string
+    author: string
+    email: string
+    phone: string
+    facebook: string
+    instagram: string
+    twitter: string
+    linkedin: string
+    youtube: string
+    tiktok: string
+    address: string
+    contact: string
+    ogImage: string
+    ogType: string
+    twitterCard: string
+    // Section visibility toggles
+    showSlides: boolean
+    showBanner: boolean
+    showFeatures: boolean
+    showReasons: boolean
+    showPosts: boolean
+}
+
+const DEFAULT_SETTINGS: SettingsState = {
     siteUrl: "",
     title: "",
     name: "",
@@ -38,12 +75,23 @@ const DEFAULT_SETTINGS = {
     ogImage: "",
     ogType: "",
     twitterCard: "",
+    showSlides: true,
+    showBanner: true,
+    showFeatures: true,
+    showReasons: true,
+    showPosts: true,
 }
 
-type SettingsState = typeof DEFAULT_SETTINGS
-type SettingsKey = keyof SettingsState
+type StringSettingsKey = 'siteUrl' | 'title' | 'name' | 'logo' | 'description' | 'keywords' | 
+    'bannerTitle' | 'bannerDescription' | 'featuresTitle' | 'featuresDescription' |
+    'reasonsTitle' | 'reasonsDescription' | 'author' | 'email' | 'phone' |
+    'facebook' | 'instagram' | 'twitter' | 'linkedin' | 'youtube' | 'tiktok' |
+    'address' | 'contact' | 'ogImage' | 'ogType' | 'twitterCard'
 
-const SOCIAL_FIELDS: SettingsKey[] = ["facebook", "instagram", "twitter", "linkedin", "youtube", "tiktok"]
+type BooleanSettingsKey = 'showSlides' | 'showBanner' | 'showFeatures' | 'showReasons' | 'showPosts'
+
+const SOCIAL_FIELDS: StringSettingsKey[] = ["facebook", "instagram", "twitter", "linkedin", "youtube", "tiktok"]
+
 const InputDiv = ({ children, className }: { children: React.ReactNode, className?: string }) => {
     return (
         <div className={cn("flex flex-col gap-2", className)}>
@@ -51,6 +99,26 @@ const InputDiv = ({ children, className }: { children: React.ReactNode, classNam
         </div>
     )
 }
+
+const ToggleItem = ({ 
+    label, 
+    description, 
+    checked, 
+    onCheckedChange 
+}: { 
+    label: string
+    description: string
+    checked: boolean
+    onCheckedChange: (checked: boolean) => void 
+}) => (
+    <div className="flex items-center justify-between p-4 border rounded-lg">
+        <div className="space-y-0.5">
+            <Label className="text-base font-medium">{label}</Label>
+            <p className="text-sm text-muted-foreground">{description}</p>
+        </div>
+        <Switch checked={checked} onCheckedChange={onCheckedChange} />
+    </div>
+)
 
 export default function AdminSettingsPage() {
     const [loading, setLoading] = useState(true)
@@ -66,12 +134,29 @@ export default function AdminSettingsPage() {
         try {
             const response = await fetch("/api/admin/site-info")
             if (response.ok) {
-                const data: Partial<Record<SettingsKey, string | null>> = await response.json()
+                const data = await response.json()
                 const next = { ...DEFAULT_SETTINGS }
-                    ; (Object.keys(DEFAULT_SETTINGS) as SettingsKey[]).forEach((key) => {
-                        const value = data?.[key]
-                        next[key] = typeof value === "string" ? value : value ?? DEFAULT_SETTINGS[key]
-                    })
+                
+                // Handle string fields
+                const stringFields: StringSettingsKey[] = [
+                    'siteUrl', 'title', 'name', 'logo', 'description', 'keywords',
+                    'bannerTitle', 'bannerDescription', 'featuresTitle', 'featuresDescription',
+                    'reasonsTitle', 'reasonsDescription', 'author', 'email', 'phone',
+                    'facebook', 'instagram', 'twitter', 'linkedin', 'youtube', 'tiktok',
+                    'address', 'contact', 'ogImage', 'ogType', 'twitterCard'
+                ]
+                stringFields.forEach(key => {
+                    next[key] = data?.[key] ?? ""
+                })
+                
+                // Handle boolean fields
+                const booleanFields: BooleanSettingsKey[] = [
+                    'showSlides', 'showBanner', 'showFeatures', 'showReasons', 'showPosts'
+                ]
+                booleanFields.forEach(key => {
+                    next[key] = data?.[key] !== false && data?.[key] !== 0
+                })
+                
                 setSettings(next)
             }
         } catch (error) {
@@ -82,9 +167,13 @@ export default function AdminSettingsPage() {
         }
     }
 
-    const handleChange = (field: keyof SettingsState) => (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const handleChange = (field: StringSettingsKey) => (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const value = event.target.value
         setSettings((prev) => ({ ...prev, [field]: value }))
+    }
+
+    const handleToggle = (field: BooleanSettingsKey) => (checked: boolean) => {
+        setSettings((prev) => ({ ...prev, [field]: checked }))
     }
 
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -129,6 +218,46 @@ export default function AdminSettingsPage() {
                     </div>
                     :
                     <form onSubmit={handleSubmit} className="space-y-6">
+                        {/* Section Visibility Controls */}
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>🎛️ Hiển thị các phần trang chủ</CardTitle>
+                                <CardDescription>Bật/tắt các section hiển thị trên trang chủ</CardDescription>
+                            </CardHeader>
+                            <CardContent className="space-y-3">
+                                <ToggleItem
+                                    label="Slideshow"
+                                    description="Banner slider ở đầu trang"
+                                    checked={settings.showSlides}
+                                    onCheckedChange={handleToggle('showSlides')}
+                                />
+                                <ToggleItem
+                                    label="Banner giới thiệu"
+                                    description="Phần giới thiệu với tiêu đề và mô tả"
+                                    checked={settings.showBanner}
+                                    onCheckedChange={handleToggle('showBanner')}
+                                />
+                                <ToggleItem
+                                    label="Tính năng"
+                                    description="Section các tính năng nổi bật"
+                                    checked={settings.showFeatures}
+                                    onCheckedChange={handleToggle('showFeatures')}
+                                />
+                                <ToggleItem
+                                    label="Số liệu/Lý do"
+                                    description="Section số liệu ấn tượng (45 KHÁCH...)"
+                                    checked={settings.showReasons}
+                                    onCheckedChange={handleToggle('showReasons')}
+                                />
+                                <ToggleItem
+                                    label="Bài viết"
+                                    description="Danh sách bài viết mới nhất"
+                                    checked={settings.showPosts}
+                                    onCheckedChange={handleToggle('showPosts')}
+                                />
+                            </CardContent>
+                        </Card>
+
                         <Card>
                             <CardHeader>
                                 <CardTitle>Thông tin chung</CardTitle>
@@ -204,7 +333,7 @@ export default function AdminSettingsPage() {
                         <Card>
                             <CardHeader>
                                 <CardTitle>Section Lý do chọn</CardTitle>
-                                <CardDescription>Tiêu đề và mô tả section số liệu</CardDescription>
+                                <CardDescription>Tiêu đề và mô tả section số liệu (45 KHÁCH, 98%, 99%...)</CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <InputDiv>
@@ -302,4 +431,3 @@ export default function AdminSettingsPage() {
         </main>
     )
 }
-

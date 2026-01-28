@@ -76,6 +76,12 @@ CREATE TABLE IF NOT EXISTS `SiteInfo` (
     `ogImage` TEXT,
     `ogType` VARCHAR(100),
     `twitterCard` VARCHAR(100),
+    -- Section visibility toggles (default true)
+    `showSlides` TINYINT(1) NOT NULL DEFAULT 1,
+    `showBanner` TINYINT(1) NOT NULL DEFAULT 1,
+    `showFeatures` TINYINT(1) NOT NULL DEFAULT 1,
+    `showReasons` TINYINT(1) NOT NULL DEFAULT 1,
+    `showPosts` TINYINT(1) NOT NULL DEFAULT 1,
     `updatedAt` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     `updatedBy` VARCHAR(36),
     FOREIGN KEY (`updatedBy`) REFERENCES `User`(`id`) ON DELETE SET NULL

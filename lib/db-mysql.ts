@@ -70,6 +70,12 @@ export interface SiteInfo {
     ogImage?: string | null
     ogType?: string | null
     twitterCard?: string | null
+    // Section visibility toggles
+    showSlides?: boolean
+    showBanner?: boolean
+    showFeatures?: boolean
+    showReasons?: boolean
+    showPosts?: boolean
     updatedAt: Date
     updatedBy?: string | null
 }

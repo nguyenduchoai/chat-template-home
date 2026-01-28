@@ -27,12 +27,16 @@ export async function POST(request: Request) {
         }
 
         // Upload the file
-        const url = await uploadImage(file, {
-            folder,
-            contentType: file.type,
-        })
+        const result = await uploadImage(file, folder)
 
-        return NextResponse.json({ url, success: true })
+        if (!result.success) {
+            return NextResponse.json(
+                { error: result.error || 'Upload failed' },
+                { status: 500 }
+            )
+        }
+
+        return NextResponse.json({ url: result.url, success: true })
     } catch (error: any) {
         console.error('Upload error:', error)
         

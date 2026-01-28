@@ -1,13 +1,12 @@
 import { NextResponse } from "next/server"
-import { requireAdmin } from "@/lib/auth-supabase"
-import { createSupabaseAdminClient } from "@/lib/supabase"
+import { requireAdmin } from "@/lib/auth"
+import { deleteImage, isSupabaseConfigured } from "@/lib/storage"
 
 export async function DELETE(request: Request) {
   try {
     await requireAdmin()
 
     const { searchParams } = new URL(request.url)
-    const bucket = searchParams.get("bucket") ?? "images"
     const path = searchParams.get("path")
 
     if (!path) {
@@ -17,12 +16,11 @@ export async function DELETE(request: Request) {
       )
     }
 
-    const supabase = createSupabaseAdminClient()
-    const { error } = await supabase.storage.from(bucket).remove([path])
+    // Try to delete from local storage or Supabase
+    const success = await deleteImage(path)
 
-    if (error) {
-      console.error("Error deleting image:", error)
-      return NextResponse.json({ error: error.message }, { status: 500 })
+    if (!success) {
+      return NextResponse.json({ error: "Failed to delete image" }, { status: 500 })
     }
 
     return NextResponse.json({ success: true })

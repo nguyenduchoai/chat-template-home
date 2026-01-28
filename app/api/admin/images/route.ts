@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
-import { requireAdmin } from "@/lib/auth-supabase"
-import { createSupabaseAdminClient } from "@/lib/supabase"
+import { requireAdmin } from "@/lib/auth"
+import { listImages } from "@/lib/storage"
 
 function sanitizePrefix(prefix?: string | null) {
   if (!prefix) return ""
@@ -11,40 +11,11 @@ export async function GET(request: Request) {
   try {
     await requireAdmin()
 
-    const supabase = createSupabaseAdminClient()
     const { searchParams } = new URL(request.url)
-    const bucket = searchParams.get("bucket") ?? "images"
     const prefix = sanitizePrefix(searchParams.get("prefix")) || "posts"
     const limit = Math.min(Number(searchParams.get("limit") ?? "60"), 200)
 
-    const { data, error } = await supabase.storage
-      .from(bucket)
-      .list(prefix, {
-        limit: Number.isNaN(limit) ? 60 : limit,
-        sortBy: { column: "created_at", order: "desc" },
-      })
-
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 })
-    }
-
-    const files = (data ?? [])
-      .filter((item) => item.name)
-      .map((item) => {
-        const path = prefix ? `${prefix}/${item.name}` : item.name
-        const {
-          data: { publicUrl },
-        } = supabase.storage.from(bucket).getPublicUrl(path)
-
-        return {
-          name: item.name,
-          path,
-          size: item.metadata?.size ?? 0,
-          updatedAt: item.updated_at,
-          createdAt: item.created_at,
-          url: publicUrl,
-        }
-      })
+    const files = await listImages(prefix, limit)
 
     return NextResponse.json({ files })
   } catch (error: any) {
@@ -54,4 +25,3 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: message }, { status })
   }
 }
-

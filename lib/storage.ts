@@ -73,24 +73,104 @@ export async function uploadFile(
  */
 export async function uploadImage(
     file: File | Buffer | string,
-    options: {
-        folder?: string
-        filename?: string
-        contentType?: string
-    } = {}
-): Promise<string> {
-    const contentType = options.contentType || 'image/png'
+    folder: string = 'images'
+): Promise<{ success: boolean; url?: string; error?: string }> {
+    try {
+        let contentType = 'image/png'
+        let ext = 'png'
 
-    // Validate image type
-    if (!ALLOWED_IMAGE_TYPES.includes(contentType)) {
-        throw new Error(`Invalid image type: ${contentType}. Allowed: ${ALLOWED_IMAGE_TYPES.join(', ')}`)
+        if (file instanceof File) {
+            contentType = file.type
+            ext = file.name.split('.').pop() || 'png'
+        }
+
+        // Validate image type
+        if (!ALLOWED_IMAGE_TYPES.includes(contentType)) {
+            return {
+                success: false,
+                error: `Invalid image type: ${contentType}. Allowed: ${ALLOWED_IMAGE_TYPES.join(', ')}`
+            }
+        }
+
+        const url = await uploadFile(file, {
+            folder,
+            contentType,
+        })
+
+        return { success: true, url }
+    } catch (error: any) {
+        return { success: false, error: error.message }
     }
+}
 
-    return uploadFile(file, {
-        ...options,
-        folder: options.folder || 'images',
-        contentType,
-    })
+/**
+ * List images in a folder
+ */
+export async function listImages(
+    folder: string = 'posts',
+    limit: number = 60
+): Promise<Array<{
+    name: string
+    path: string
+    size: number
+    updatedAt: Date | null
+    createdAt: Date | null
+    url: string
+}>> {
+    try {
+        const folderPath = path.join(UPLOAD_DIR, folder)
+        
+        // Check if folder exists
+        try {
+            await fs.access(folderPath)
+        } catch {
+            return []
+        }
+
+        const files = await fs.readdir(folderPath)
+        const results = []
+
+        for (const fileName of files.slice(0, limit)) {
+            const filePath = path.join(folderPath, fileName)
+            try {
+                const stats = await fs.stat(filePath)
+                if (stats.isFile()) {
+                    results.push({
+                        name: fileName,
+                        path: `${folder}/${fileName}`,
+                        size: stats.size,
+                        updatedAt: stats.mtime,
+                        createdAt: stats.birthtime,
+                        url: `/uploads/${folder}/${fileName}`,
+                    })
+                }
+            } catch {
+                // Skip files we can't stat
+            }
+        }
+
+        // Sort by creation date descending
+        results.sort((a, b) => (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0))
+
+        return results
+    } catch (error) {
+        console.error('Error listing images:', error)
+        return []
+    }
+}
+
+/**
+ * Delete an image
+ */
+export async function deleteImage(urlPath: string): Promise<boolean> {
+    return deleteFile(urlPath)
+}
+
+/**
+ * Check if Supabase is configured (for backward compat)
+ */
+export function isSupabaseConfigured(): boolean {
+    return !!(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
 }
 
 /**

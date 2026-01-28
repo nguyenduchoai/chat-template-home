@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server"
-import { requireAdmin, requireSuperadmin } from "@/lib/auth-supabase"
+import { requireAdmin, requireSuperadmin } from "@/lib/auth"
 import { createUser, getAllUsers, getUsersPaginated } from "@/lib/db"
-import { createSupabaseAdminClient } from "@/lib/supabase"
 import bcrypt from "bcryptjs"
 
 export async function GET(request: Request) {
@@ -28,8 +27,6 @@ export async function GET(request: Request) {
     }
 }
 
-
-
 export async function POST(request: Request) {
     try {
         await requireSuperadmin()
@@ -49,33 +46,6 @@ export async function POST(request: Request) {
             password: hashedPassword,
             role,
         })
-
-        if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
-            try {
-                const supabaseAdmin = createSupabaseAdminClient()
-                
-                const { data: existingUsers } = await supabaseAdmin.auth.admin.listUsers()
-                const existingAuthUser = existingUsers?.users.find(u => u.email === email)
-
-                if (existingAuthUser) {
-                    await supabaseAdmin.auth.admin.updateUserById(existingAuthUser.id, { password })
-                } else {
-                    const { error: authError } = await supabaseAdmin.auth.admin.createUser({
-                        email,
-                        password,
-                        email_confirm: true,
-                    })
-
-                    if (authError) {
-                        console.warn("Warning: Could not create user in Supabase Auth:", authError.message)
-                    }
-                }
-            } catch (authError) {
-                console.warn("Warning: Could not create user in Supabase Auth:", authError)
-            }
-        } else {
-            console.warn("Warning: SUPABASE_SERVICE_ROLE_KEY not set - user will be created in Supabase Auth on first login")
-        }
 
         return NextResponse.json(user, { status: 201 })
     } catch (error: any) {

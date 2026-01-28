@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
-import { requireAdmin } from "@/lib/auth-supabase"
-import { createSupabaseAdminClient } from "@/lib/supabase"
+import { requireAdmin } from "@/lib/auth"
+import { uploadImage } from "@/lib/storage"
 
 function sanitizeFolder(folder?: string | null) {
   if (!folder) return "posts"
@@ -13,7 +13,6 @@ export async function POST(request: Request) {
 
     const formData = await request.formData()
     const file = formData.get("file") as File
-    const bucket = (formData.get("bucket") as string) || "images"
     const folder = sanitizeFolder(formData.get("folder") as string | null)
 
     if (!file) {
@@ -28,41 +27,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Kích thước file không được vượt quá 5MB" }, { status: 400 })
     }
 
-    const supabase = createSupabaseAdminClient()
+    // Upload to local storage
+    const result = await uploadImage(file, folder)
 
-    const fileExt = file.name.split(".").pop()
-    const fileName = `${Math.random().toString(36).substring(7)}-${Date.now()}.${fileExt}`
-    const filePath = folder ? `${folder}/${fileName}` : fileName
-
-    const arrayBuffer = await file.arrayBuffer()
-
-    const { data: uploadData, error: uploadError } = await supabase.storage
-      .from(bucket)
-      .upload(filePath, arrayBuffer, {
-        contentType: file.type,
-        upsert: false,
-      })
-
-    if (uploadError) {
-      console.error("Supabase upload error:", uploadError)
-      
-      if (uploadError.message?.includes("row-level security policy") || uploadError.message?.includes("RLS")) {
-        return NextResponse.json(
-          { 
-            error: "Lỗi RLS policy. Vui lòng chạy SQL script trong supabase/migrations/002_storage_policies.sql trong Supabase SQL Editor" 
-          },
-          { status: 500 }
-        )
-      }
-      
-      return NextResponse.json({ error: uploadError.message || "Không thể tải ảnh lên" }, { status: 500 })
+    if (!result.success) {
+      return NextResponse.json({ error: result.error || "Không thể tải ảnh lên" }, { status: 500 })
     }
 
-    const {
-      data: { publicUrl },
-    } = supabase.storage.from(bucket).getPublicUrl(filePath)
-
-    return NextResponse.json({ url: publicUrl })
+    return NextResponse.json({ url: result.url })
   } catch (error: any) {
     console.error("Error uploading image:", error)
     const message = error?.message || "Không thể tải ảnh lên"
@@ -70,4 +42,3 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: message }, { status })
   }
 }
-
