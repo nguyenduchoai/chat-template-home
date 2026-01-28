@@ -1,5 +1,3 @@
-'use client'
-
 /**
  * Wrapper around next/image that always uses unoptimized mode
  * This ensures images work correctly with VPS/Nginx reverse proxy
