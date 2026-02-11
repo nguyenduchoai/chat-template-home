@@ -2,13 +2,11 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { MessageSquare, Send } from "lucide-react"
-import { useState, useEffect, useRef } from "react"
-import { convertColorForCSS } from "@/lib/color-utils"
+import { MessageSquare, Send, Phone } from "lucide-react"
+import { useState } from "react"
 import { useSiteInfo } from "@/components/providers/SiteInfoProvider"
 
-export default function ChatBar() {
+export default function Footer() {
     const [query, setQuery] = useState("")
     const pathname = usePathname()
     const siteInfo = useSiteInfo()
@@ -18,46 +16,63 @@ export default function ChatBar() {
         return null
     }
 
-    const placeholder = siteInfo?.chatInputPlaceholder || "Hỏi bất cứ điều gì về AI..."
+    const placeholder = siteInfo?.chatInputPlaceholder || "Bạn nhập câu hỏi"
+    const phone = siteInfo?.phone
+    const hotlineText = siteInfo?.footerHotlineText || "Liên hệ Bác sỹ để được tư vấn tốt hơn"
+    const chatHint = siteInfo?.footerChatHint || "Vui lòng nhập câu hỏi để được tư vấn"
+
+    const handleSubmit = () => {
+        if (query.trim()) {
+            window.location.href = `/tro-chuyen?q=${encodeURIComponent(query)}`
+        }
+    }
 
     return (
-
         <div>
-            <div className="h-32" />
-            <section className=" fixed bottom-0 left-0 right-0  w-full py-8 px-4"
-                style={{
-                    background: "linear-gradient(to top, var(--home-gradient-from), transparent)",
-                }}>
-                <div className="container mx-auto">
-                    <div className="flex flex-col gap-2 sm:gap-3 md:flex-row md:items-center p-3 sm:p-4 border rounded-xl sm:rounded-2xl bg-white">
-                        <div className="flex items-center gap-2 flex-1 w-full min-w-0">
-                            <MessageSquare className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground flex-shrink-0" />
+            {/* Spacer to prevent content from being hidden behind fixed footer */}
+            <div className="h-28" />
+
+            {/* Fixed footer */}
+            <footer className="fixed bottom-0 left-0 right-0 z-50 dental-fixed-footer">
+                {/* Hotline bar */}
+                {phone && (
+                    <div className="dental-hotline-bar">
+                        <span className="text-gray-400 text-sm">{hotlineText} –</span>
+                        <a href={`tel:${phone}`} className="dental-footer-hotline font-bold text-sm flex items-center gap-1">
+                            <Phone className="h-3.5 w-3.5" />
+                            Hotline: {phone}
+                        </a>
+                    </div>
+                )}
+
+                {/* Chat input bar */}
+                <div className="dental-chat-bar">
+                    <div className="container mx-auto px-4">
+                        <p className="text-gray-500 text-xs text-center mb-2">{chatHint}</p>
+                        <div className="dental-chat-input-bar">
+                            <MessageSquare className="h-5 w-5 text-gray-500 flex-shrink-0" />
                             <input
                                 type="text"
                                 placeholder={placeholder}
                                 value={query}
                                 onChange={(e) => setQuery(e.target.value)}
                                 onKeyDown={(e) => {
-                                    if (e.key === "Enter" && query.trim()) {
-                                        window.location.href = `/tro-chuyen?q=${encodeURIComponent(query)}`
-                                    }
+                                    if (e.key === "Enter") handleSubmit()
                                 }}
-                                className="flex-1 outline-none bg-transparent text-foreground placeholder:text-muted-foreground text-sm sm:text-base md:text-lg min-w-0"
+                                className="dental-footer-input"
                             />
+                            <Link
+                                href={`/tro-chuyen${query ? `?q=${encodeURIComponent(query)}` : ""}`}
+                                className="flex-shrink-0"
+                            >
+                                <button className="dental-footer-send-btn">
+                                    <Send className="h-4 w-4" />
+                                </button>
+                            </Link>
                         </div>
-                        <Link
-                            href={`/tro-chuyen${query ? `?q=${encodeURIComponent(query)}` : ""}`}
-                            className="w-full md:w-auto flex-shrink-0"
-                        >
-                            <Button size="lg" className="w-full md:w-auto gap-2 text-sm sm:text-base">
-                                <Send className="h-3 w-3 sm:h-4 sm:w-4" />
-                                Trò chuyện
-                            </Button>
-                        </Link>
                     </div>
                 </div>
-            </section>
-        </div >
+            </footer>
+        </div>
     )
 }
-

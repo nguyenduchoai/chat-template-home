@@ -16,6 +16,7 @@ interface ChatInputProps {
     disabled?: boolean
     logoUrl?: string
     siteLogo?: string | null
+    hintText?: string
 }
 
 export function ChatInput({
@@ -26,6 +27,7 @@ export function ChatInput({
     disabled = false,
     logoUrl,
     siteLogo: siteLogoProp,
+    hintText,
 }: ChatInputProps) {
     const [message, setMessage] = useState("")
     const [siteLogoError, setSiteLogoError] = useState(false)
@@ -220,7 +222,7 @@ export function ChatInput({
                     className="text-[10px] sm:text-xs text-center mt-2 sm:mt-3 px-2 sm:px-4"
                     style={{ color: "var(--chat-input-placeholder)" }}
                 >
-                    Nhập nội dung của bạn vào đây để bắt đầu trò chuyện
+                    {hintText || 'Nhập nội dung của bạn vào đây để bắt đầu trò chuyện'}
                 </p>
             </form>
         </div>

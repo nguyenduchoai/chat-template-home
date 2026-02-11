@@ -1,5 +1,7 @@
-import Banner from "@/components/Banner"
 import SlideShow from "@/components/SlideShow"
+import HeroSection from "@/components/HeroSection"
+import FeaturesSectionDental from "@/components/FeaturesSectionDental"
+import StatsSectionDental from "@/components/StatsSectionDental"
 import { PostsSection } from "@/components/PostsSection"
 import { getPublishedPosts, getSiteInfoRecord } from "@/lib/db"
 
@@ -21,16 +23,19 @@ async function getSiteSettings() {
   try {
     const siteInfo = await getSiteInfoRecord()
     return {
-      showSlides: siteInfo?.showSlides !== false,
-      showBanner: siteInfo?.showBanner !== false,
-      showPosts: siteInfo?.showPosts !== false,
+      showSlides: !!siteInfo?.showSlides,
+      showBanner: !!siteInfo?.showBanner,
+      showFeatures: !!siteInfo?.showFeatures,
+      showReasons: !!siteInfo?.showReasons,
+      showPosts: !!siteInfo?.showPosts,
     }
   } catch (error) {
     console.error("[getSiteSettings] Error:", error)
-    // Default to show all sections
     return {
       showSlides: true,
       showBanner: true,
+      showFeatures: true,
+      showReasons: true,
       showPosts: true,
     }
   }
@@ -40,9 +45,11 @@ export default async function Home() {
   const [posts, settings] = await Promise.all([getPosts(), getSiteSettings()])
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center">
+    <main className="dental-home min-h-screen">
       {settings.showSlides && <SlideShow />}
-      {settings.showBanner && <Banner />}
+      {settings.showBanner && <HeroSection />}
+      {settings.showFeatures && <FeaturesSectionDental />}
+      {settings.showReasons && <StatsSectionDental />}
       {settings.showPosts && <PostsSection posts={posts} />}
     </main>
   )

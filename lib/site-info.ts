@@ -41,6 +41,18 @@ export interface SiteInfo {
   chatInputPlaceholder?: string
   homeTitleSize?: string
   homeDescriptionSize?: string
+  heroBgImage?: string
+  heroBgColor?: string
+  featuresBgImage?: string
+  featuresBgColor?: string
+  statsBgImage?: string
+  statsBgColor?: string
+  heroCta?: string
+  footerHotlineText?: string
+  footerChatHint?: string
+  chatPageHint?: string
+  copyrightText?: string
+  headerLinks?: string
 }
 
 // Server-side: Get from database

@@ -82,6 +82,23 @@ export interface SiteInfo {
     chatApiUrl?: string | null
     chatApiKey?: string | null
     chatInputPlaceholder?: string | null
+    // Font sizes
+    homeTitleSize?: string | null
+    homeDescriptionSize?: string | null
+    // Section backgrounds
+    heroBgImage?: string | null
+    heroBgColor?: string | null
+    featuresBgImage?: string | null
+    featuresBgColor?: string | null
+    statsBgImage?: string | null
+    statsBgColor?: string | null
+    // Customizable texts
+    heroCta?: string | null
+    footerHotlineText?: string | null
+    footerChatHint?: string | null
+    chatPageHint?: string | null
+    copyrightText?: string | null
+    headerLinks?: string | null
     updatedAt: Date
     updatedBy?: string | null
 }

@@ -1,9 +1,9 @@
 module.exports = {
     apps: [{
-        name: 'chat-template',
+        name: 'saigondental',
         script: 'node_modules/.bin/next',
         args: 'start',
-        cwd: '/www/wwwroot/kienthucnhakhoa.ai/chat-template-home',
+        cwd: '/www/wwwroot/saigondental.ai',
         instances: 1,
         autorestart: true,
         watch: false,

@@ -39,6 +39,8 @@ interface SettingsState {
     // Section visibility toggles
     showSlides: boolean
     showBanner: boolean
+    showFeatures: boolean
+    showReasons: boolean
     showPosts: boolean
     // Bizino AI Chat Configuration
     chatEnabled: boolean
@@ -48,6 +50,19 @@ interface SettingsState {
     chatInputPlaceholder: string
     homeTitleSize: string
     homeDescriptionSize: string
+    // Section backgrounds
+    heroBgImage: string
+    heroBgColor: string
+    featuresBgImage: string
+    featuresBgColor: string
+    statsBgImage: string
+    statsBgColor: string
+    // Customizable texts
+    heroCta: string
+    footerHotlineText: string
+    footerChatHint: string
+    chatPageHint: string
+    copyrightText: string
 }
 
 const DEFAULT_SETTINGS: SettingsState = {
@@ -75,6 +90,8 @@ const DEFAULT_SETTINGS: SettingsState = {
     twitterCard: "",
     showSlides: true,
     showBanner: true,
+    showFeatures: true,
+    showReasons: true,
     showPosts: true,
     // Bizino AI Chat defaults
     chatEnabled: true,
@@ -84,6 +101,17 @@ const DEFAULT_SETTINGS: SettingsState = {
     chatInputPlaceholder: "Hỏi bất cứ điều gì về AI...",
     homeTitleSize: "6xl",
     homeDescriptionSize: "xl",
+    heroBgImage: "",
+    heroBgColor: "",
+    featuresBgImage: "",
+    featuresBgColor: "",
+    statsBgImage: "",
+    statsBgColor: "",
+    heroCta: "",
+    footerHotlineText: "",
+    footerChatHint: "",
+    chatPageHint: "",
+    copyrightText: "",
 }
 
 type StringSettingsKey = 'siteUrl' | 'title' | 'name' | 'logo' | 'description' | 'keywords' | 
@@ -91,9 +119,11 @@ type StringSettingsKey = 'siteUrl' | 'title' | 'name' | 'logo' | 'description' |
     'facebook' | 'instagram' | 'twitter' | 'linkedin' | 'youtube' | 'tiktok' |
     'chatAssistantId' | 'chatApiUrl' | 'chatApiKey' | 'chatInputPlaceholder' |
     'address' | 'contact' | 'ogImage' | 'ogType' | 'twitterCard' |
-    'homeTitleSize' | 'homeDescriptionSize'
+    'homeTitleSize' | 'homeDescriptionSize' |
+    'heroBgImage' | 'heroBgColor' | 'featuresBgImage' | 'featuresBgColor' | 'statsBgImage' | 'statsBgColor' |
+    'heroCta' | 'footerHotlineText' | 'footerChatHint' | 'chatPageHint' | 'copyrightText'
 
-type BooleanSettingsKey = 'showSlides' | 'showBanner' | 'showPosts' | 'chatEnabled'
+type BooleanSettingsKey = 'showSlides' | 'showBanner' | 'showFeatures' | 'showReasons' | 'showPosts' | 'chatEnabled'
 
 const SOCIAL_FIELDS: StringSettingsKey[] = ["facebook", "instagram", "twitter", "linkedin", "youtube", "tiktok"]
 
@@ -149,7 +179,9 @@ export default function AdminSettingsPage() {
                     'facebook', 'instagram', 'twitter', 'linkedin', 'youtube', 'tiktok',
                     'address', 'contact', 'ogImage', 'ogType', 'twitterCard',
                     'chatAssistantId', 'chatApiUrl', 'chatApiKey', 'chatInputPlaceholder',
-                    'homeTitleSize', 'homeDescriptionSize'
+                    'homeTitleSize', 'homeDescriptionSize',
+                    'heroBgImage', 'heroBgColor', 'featuresBgImage', 'featuresBgColor', 'statsBgImage', 'statsBgColor',
+                    'heroCta', 'footerHotlineText', 'footerChatHint', 'chatPageHint', 'copyrightText'
                 ]
                 stringFields.forEach(key => {
                     next[key] = data?.[key] ?? ""
@@ -157,7 +189,7 @@ export default function AdminSettingsPage() {
                 
                 // Handle boolean fields
                 const booleanFields: BooleanSettingsKey[] = [
-                    'showSlides', 'showBanner', 'showPosts', 'chatEnabled'
+                    'showSlides', 'showBanner', 'showFeatures', 'showReasons', 'showPosts', 'chatEnabled'
                 ]
                 booleanFields.forEach(key => {
                     next[key] = data?.[key] !== false && data?.[key] !== 0
@@ -242,6 +274,18 @@ export default function AdminSettingsPage() {
                                     description="Phần giới thiệu với tiêu đề và mô tả"
                                     checked={settings.showBanner}
                                     onCheckedChange={handleToggle('showBanner')}
+                                />
+                                <ToggleItem
+                                    label="Tính năng nổi bật"
+                                    description="Các card tính năng (Features)"
+                                    checked={settings.showFeatures}
+                                    onCheckedChange={handleToggle('showFeatures')}
+                                />
+                                <ToggleItem
+                                    label="Số liệu nổi bật"
+                                    description="Các card thống kê (Stats)"
+                                    checked={settings.showReasons}
+                                    onCheckedChange={handleToggle('showReasons')}
                                 />
                                 <ToggleItem
                                     label="Bài viết"
@@ -436,6 +480,107 @@ export default function AdminSettingsPage() {
                                         />
                                     </InputDiv>
                                 ))}
+                            </CardContent>
+                        </Card>
+
+                        {/* Section Backgrounds */}
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>🎨 Nền các Section trang chủ</CardTitle>
+                                <CardDescription>Upload ảnh nền hoặc nhập mã màu/gradient cho từng block</CardDescription>
+                            </CardHeader>
+                            <CardContent className="space-y-6">
+                                {/* Hero Background */}
+                                <div className="space-y-3 p-4 border rounded-lg">
+                                    <h3 className="font-semibold text-sm">🦷 Hero Section</h3>
+                                    <ImageUpload
+                                        label="Ảnh nền Hero"
+                                        value={settings.heroBgImage}
+                                        onChange={(url) => setSettings((prev) => ({ ...prev, heroBgImage: url }))}
+                                        enableLibrary
+                                        folder="backgrounds"
+                                    />
+                                    <InputDiv>
+                                        <label className="text-sm font-medium">Màu nền Hero (CSS)</label>
+                                        <Input 
+                                            value={settings.heroBgColor} 
+                                            onChange={handleChange("heroBgColor")} 
+                                            placeholder="VD: #0d0d1a hoặc linear-gradient(135deg, #1a1a2e, #0d0d1a)"
+                                        />
+                                        <p className="text-xs text-muted-foreground">Nếu có ảnh nền thì ảnh sẽ ưu tiên hiển thị. Để trống = dùng mặc định</p>
+                                    </InputDiv>
+                                </div>
+
+                                {/* Features Background */}
+                                <div className="space-y-3 p-4 border rounded-lg">
+                                    <h3 className="font-semibold text-sm">⭐ Features Section</h3>
+                                    <ImageUpload
+                                        label="Ảnh nền Features"
+                                        value={settings.featuresBgImage}
+                                        onChange={(url) => setSettings((prev) => ({ ...prev, featuresBgImage: url }))}
+                                        enableLibrary
+                                        folder="backgrounds"
+                                    />
+                                    <InputDiv>
+                                        <label className="text-sm font-medium">Màu nền Features (CSS)</label>
+                                        <Input 
+                                            value={settings.featuresBgColor} 
+                                            onChange={handleChange("featuresBgColor")} 
+                                            placeholder="VD: #12122a hoặc linear-gradient(180deg, #0d0d1a, #12122a)"
+                                        />
+                                    </InputDiv>
+                                </div>
+
+                                {/* Stats Background */}
+                                <div className="space-y-3 p-4 border rounded-lg">
+                                    <h3 className="font-semibold text-sm">📊 Stats Section</h3>
+                                    <ImageUpload
+                                        label="Ảnh nền Stats"
+                                        value={settings.statsBgImage}
+                                        onChange={(url) => setSettings((prev) => ({ ...prev, statsBgImage: url }))}
+                                        enableLibrary
+                                        folder="backgrounds"
+                                    />
+                                    <InputDiv>
+                                        <label className="text-sm font-medium">Màu nền Stats (CSS)</label>
+                                        <Input 
+                                            value={settings.statsBgColor} 
+                                            onChange={handleChange("statsBgColor")} 
+                                            placeholder="VD: #0d0d1a hoặc linear-gradient(180deg, #12122a, #0d0d1a)"
+                                        />
+                                    </InputDiv>
+                                </div>
+                            </CardContent>
+                        </Card>
+
+                        {/* Customizable Texts */}
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>✏️ Nội dung tuỳ chỉnh</CardTitle>
+                                <CardDescription>Các đoạn text hiển thị trên trang. Để trống = dùng mặc định</CardDescription>
+                            </CardHeader>
+                            <CardContent className="grid gap-4 md:grid-cols-2">
+                                <InputDiv className="md:col-span-2">
+                                    <label className="text-sm font-medium">Nút CTA Hero</label>
+                                    <Input value={settings.heroCta} onChange={handleChange("heroCta")} placeholder="Bắt đầu tư vấn nha khoa ngay" />
+                                    <p className="text-xs text-muted-foreground">Nút kêu gọi hành động trên Hero section</p>
+                                </InputDiv>
+                                <InputDiv>
+                                    <label className="text-sm font-medium">Text Hotline footer</label>
+                                    <Input value={settings.footerHotlineText} onChange={handleChange("footerHotlineText")} placeholder="Liên hệ Bác sỹ để được tư vấn tốt hơn" />
+                                </InputDiv>
+                                <InputDiv>
+                                    <label className="text-sm font-medium">Gợi ý nhập chat (footer)</label>
+                                    <Input value={settings.footerChatHint} onChange={handleChange("footerChatHint")} placeholder="Vui lòng nhập câu hỏi để được tư vấn" />
+                                </InputDiv>
+                                <InputDiv>
+                                    <label className="text-sm font-medium">Gợi ý trang chat</label>
+                                    <Input value={settings.chatPageHint} onChange={handleChange("chatPageHint")} placeholder="Nhập nội dung của bạn vào đây để bắt đầu trò chuyện" />
+                                </InputDiv>
+                                <InputDiv>
+                                    <label className="text-sm font-medium">Copyright / Bản quyền</label>
+                                    <Input value={settings.copyrightText} onChange={handleChange("copyrightText")} placeholder="© 2025 Saigon Dental AI. All rights reserved." />
+                                </InputDiv>
                             </CardContent>
                         </Card>
 

@@ -17,6 +17,7 @@ const ChatContainer = () => {
     const [loadingChat, setLoadingChat] = useState(false);
     const [hasTriedLoad, setHasTriedLoad] = useState(false); // Track if we've attempted to load
     const [siteLogo, setSiteLogo] = useState<string | null>(null);
+    const [chatPageHint, setChatPageHint] = useState<string>('');
     const messagesEndRef = useRef<any>(null);
     useEffect(() => {
         if (messagesEndRef.current) {
@@ -34,6 +35,9 @@ const ChatContainer = () => {
                     const data = await res.json()
                     if (data.logo) {
                         setSiteLogo(data.logo)
+                    }
+                    if (data.chatPageHint) {
+                        setChatPageHint(data.chatPageHint)
                     }
                 }
             } catch (error) {
@@ -428,8 +432,8 @@ const ChatContainer = () => {
       text-align: right;
     }
     .assistant-message {
-      background-color: #f1f1f1;
-      color: #333;
+      background-color: rgba(255,255,255,0.08);
+      color: #e8e8f0;
       margin-right: auto;
       text-align: left;
     }
@@ -467,7 +471,7 @@ const ChatContainer = () => {
                                                 <ChatLogo width={32} height={32} />
                                             </div>
                                             <div className=" flex max-w-[calc(100%-52px)] flex-grow flex-col space-y-2 bg-transparent lg:max-w-[calc(100%-56px)]">
-                                                <div className="w-full text-[17px] font-normal leading-[22px] text-gray-700">
+                                                <div className="w-full text-[17px] font-normal leading-[22px] text-gray-200">
                                                     <MarkdownMessage content={message.message} />
                                                 </div>
                                                 {
@@ -476,7 +480,7 @@ const ChatContainer = () => {
                                                             <button
                                                                 type="button"
                                                                 onClick={handleCopyAllMessages}
-                                                                className='p-1 text-sm text-gray-500 hover:text-blue-600 cursor-pointer'
+                                                                className='p-1 text-sm text-gray-400 hover:text-[#c5a664] cursor-pointer'
                                                                 aria-label="Sao chép toàn bộ cuộc hội thoại"
                                                             >
                                                                 <CopyIcon className="w-4 h-4" />
@@ -500,10 +504,10 @@ const ChatContainer = () => {
                             {loading && (
                                 <div className="h-[80px] flex items-center gap-2 p-4">
                                     <ChatLogo width={32} height={32} />
-                                    <div className="flex items-center gap-1 p-2 rounded-full bg-gray-200">
-                                        <span className="w-2 h-2 bg-gray-500 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
-                                        <span className="w-2 h-2 bg-gray-500 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
-                                        <span className="w-2 h-2 bg-gray-500 rounded-full animate-bounce"></span>
+                                    <div className="flex items-center gap-1 p-2 rounded-full bg-white/10">
+                                        <span className="w-2 h-2 bg-[#c5a664] rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+                                        <span className="w-2 h-2 bg-[#c5a664] rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+                                        <span className="w-2 h-2 bg-[#c5a664] rounded-full animate-bounce"></span>
                                     </div>
                                 </div>
                             )}
@@ -524,6 +528,7 @@ const ChatContainer = () => {
                             disabled={loadingChat}
                             logoUrl={botInfo?.setting?.logo_url || undefined}
                             siteLogo={siteLogo}
+                            hintText={chatPageHint}
                         />
                     </div>
                 </div>
