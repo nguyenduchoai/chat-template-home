@@ -50,6 +50,7 @@ export interface SiteInfo {
   heroCta?: string
   footerHotlineText?: string
   footerChatHint?: string
+  chatGreeting?: string
   chatPageHint?: string
   copyrightText?: string
   headerLinks?: string

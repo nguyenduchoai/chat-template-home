@@ -76,19 +76,19 @@ function SortableItem({ feature, onEdit, onDelete }: {
         <div
             ref={setNodeRef}
             style={style}
-            className="flex flex-col gap-4 p-4 bg-white border rounded-lg hover:shadow-md transition-shadow sm:flex-row sm:items-center"
+            className="flex flex-col gap-4 p-4 bg-card border rounded-lg hover:shadow-md transition-shadow sm:flex-row sm:items-center"
         >
             <div className="flex flex-1 gap-4">
                 <div
                     {...attributes}
                     {...listeners}
-                    className="cursor-grab active:cursor-grabbing text-gray-400 flex-shrink-0 pt-1"
+                    className="cursor-grab active:cursor-grabbing text-muted-foreground flex-shrink-0 pt-1"
                 >
                     <GripVertical className="h-5 w-5" />
                 </div>
                 <div className="flex gap-3 flex-1">
-                    {feature.icon.startsWith('http') ? (
-                        <div className="w-12 h-12 relative rounded-lg overflow-hidden border flex-shrink-0">
+                    {feature.icon.startsWith('http') || feature.icon.startsWith('/') ? (
+                        <div className="w-12 h-12 relative rounded-lg overflow-hidden border flex-shrink-0 bg-muted">
                             <Image
                                 src={feature.icon}
                                 alt={feature.title}
@@ -104,10 +104,10 @@ function SortableItem({ feature, onEdit, onDelete }: {
                         <div className="flex flex-wrap items-center gap-2">
                             <h3 className="font-semibold text-base">{feature.title}</h3>
                             {!feature.active && (
-                                <span className="text-xs bg-gray-100 px-2 py-1 rounded-full text-gray-600">Ẩn</span>
+                                <span className="text-xs bg-muted px-2 py-1 rounded-full text-muted-foreground">Ẩn</span>
                             )}
                         </div>
-                        <p className="text-sm text-gray-600">{feature.description}</p>
+                        <p className="text-sm text-muted-foreground">{feature.description}</p>
                     </div>
                 </div>
             </div>
@@ -119,7 +119,7 @@ function SortableItem({ feature, onEdit, onDelete }: {
                     variant="outline"
                     size="sm"
                     onClick={() => onDelete(feature.id)}
-                    className="text-red-600 hover:text-red-700"
+                    className="text-destructive hover:text-destructive hover:bg-destructive/10"
                 >
                     <Trash2 className="h-4 w-4" />
                 </Button>
@@ -130,16 +130,16 @@ function SortableItem({ feature, onEdit, onDelete }: {
 
 function FeatureSkeleton() {
     return (
-        <div className="p-4 border rounded-lg bg-white animate-pulse space-y-4">
+        <div className="p-4 border rounded-lg bg-card animate-pulse space-y-4">
             <div className="flex items-center gap-4">
-                <div className="h-5 w-5 bg-gray-200 rounded" />
-                <div className="w-12 h-12 bg-gray-200 rounded-lg" />
+                <div className="h-5 w-5 bg-muted rounded" />
+                <div className="w-12 h-12 bg-muted rounded-lg" />
                 <div className="flex-1 space-y-2">
-                    <div className="h-4 bg-gray-200 rounded w-1/2" />
-                    <div className="h-3 bg-gray-100 rounded w-3/4" />
+                    <div className="h-4 bg-muted rounded w-1/2" />
+                    <div className="h-3 bg-muted rounded w-3/4" />
                 </div>
             </div>
-            <div className="h-3 bg-gray-100 rounded w-5/6" />
+            <div className="h-3 bg-muted rounded w-5/6" />
         </div>
     )
 }
@@ -347,7 +347,7 @@ export default function FeaturesPage() {
 
         if (!features.length) {
             return (
-                <div className="border rounded-lg bg-white p-10 text-center text-gray-500">
+                <div className="border rounded-lg bg-card p-10 text-center text-muted-foreground">
                     Chưa có tính năng nào. Nhấn "Thêm mới" để bắt đầu.
                 </div>
             )
@@ -406,7 +406,7 @@ export default function FeaturesPage() {
                             {/* Icon/Image Upload */}
                             <div className="space-y-2">
                                 <Label>
-                                    Icon / Ảnh <span className="text-red-500">*</span>
+                                    Icon / Ảnh <span className="text-destructive">*</span>
                                 </Label>
                                 <ImageUpload
                                     value={iconValue}
@@ -416,19 +416,19 @@ export default function FeaturesPage() {
                                     enableLibrary
                                 />
                                 {errors.icon && (
-                                    <p className="text-sm text-red-500">{errors.icon.message}</p>
+                                    <p className="text-sm text-destructive">{errors.icon.message}</p>
                                 )}
                             </div>
 
                             <div className="grid gap-6 md:grid-cols-2">
                                 <div className="space-y-2 col-span-2">
                                     <Label htmlFor="title">
-                                        Tiêu đề <span className="text-red-500">*</span>
+                                        Tiêu đề <span className="text-destructive">*</span>
                                     </Label>
                                     <Input
                                         id="title"
                                         placeholder="Ví dụ: Tư vấn 24/7"
-                                        className={errors.title ? 'border-red-500 focus-visible:ring-red-500' : ''}
+                                        className={errors.title ? 'border-destructive focus-visible:ring-destructive' : ''}
                                         {...register('title', {
                                             required: 'Tiêu đề là bắt buộc',
                                             minLength: {
@@ -438,7 +438,7 @@ export default function FeaturesPage() {
                                         })}
                                     />
                                     {errors.title && (
-                                        <p className="text-sm text-red-500">{errors.title.message}</p>
+                                        <p className="text-sm text-destructive">{errors.title.message}</p>
                                     )}
                                 </div>
 
@@ -446,7 +446,7 @@ export default function FeaturesPage() {
                                     <Label className="inline-flex items-center gap-2" htmlFor="active">
                                         Hiển thị công khai
                                     </Label>
-                                    <div className="flex items-center space-x-3 p-4 bg-gray-50 rounded-lg h-full">
+                                    <div className="flex items-center space-x-3 p-4 bg-muted/50 rounded-lg h-full">
                                         <Controller
                                             name="active"
                                             control={control}
@@ -460,7 +460,7 @@ export default function FeaturesPage() {
                                         />
                                         <div>
                                             <p className="font-medium text-sm">Đang hiển thị trên trang chủ</p>
-                                            <p className="text-xs text-gray-500">
+                                            <p className="text-xs text-muted-foreground">
                                                 Tắt để ẩn tính năng này với khách hàng
                                             </p>
                                         </div>
@@ -471,13 +471,13 @@ export default function FeaturesPage() {
                             {/* Description */}
                             <div className="space-y-2">
                                 <Label htmlFor="description">
-                                    Mô tả <span className="text-red-500">*</span>
+                                    Mô tả <span className="text-destructive">*</span>
                                 </Label>
                                 <Textarea
                                     id="description"
                                     rows={4}
                                     placeholder="Mô tả chi tiết về tính năng này..."
-                                    className={errors.description ? 'border-red-500 focus-visible:ring-red-500' : ''}
+                                    className={errors.description ? 'border-destructive focus-visible:ring-destructive' : ''}
                                     {...register('description', {
                                         required: 'Mô tả là bắt buộc',
                                         minLength: {
@@ -486,10 +486,10 @@ export default function FeaturesPage() {
                                         },
                                     })}
                                 />
-                                <div className="flex justify-between text-xs text-gray-500">
+                                <div className="flex justify-between text-xs text-muted-foreground">
                                     <span>{descriptionValue?.length || 0} ký tự</span>
                                     {errors.description && (
-                                        <span className="text-red-500">{errors.description.message}</span>
+                                        <span className="text-destructive">{errors.description.message}</span>
                                     )}
                                 </div>
                             </div>

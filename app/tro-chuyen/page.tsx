@@ -18,6 +18,7 @@ const ChatContainer = () => {
     const [hasTriedLoad, setHasTriedLoad] = useState(false); // Track if we've attempted to load
     const [siteLogo, setSiteLogo] = useState<string | null>(null);
     const [chatPageHint, setChatPageHint] = useState<string>('');
+    const [chatGreeting, setChatGreeting] = useState<string>('');
     const messagesEndRef = useRef<any>(null);
     useEffect(() => {
         if (messagesEndRef.current) {
@@ -38,6 +39,9 @@ const ChatContainer = () => {
                     }
                     if (data.chatPageHint) {
                         setChatPageHint(data.chatPageHint)
+                    }
+                    if (data.chatGreeting) {
+                        setChatGreeting(data.chatGreeting)
                     }
                 }
             } catch (error) {
@@ -516,7 +520,7 @@ const ChatContainer = () => {
                         </ScrollToBottom>
                     </div>
                 ) : (
-                    <DefaultChat setPrompt={handleGetPrompt} config={botInfo} />
+                    <DefaultChat setPrompt={handleGetPrompt} config={botInfo} chatGreeting={chatGreeting} />
                 )}
                 <div className="pointer-events-none fixed bottom-0 left-0 right-0 flex flex-col items-center justify-end px-[16px] lg:px-[calc((100vw_-_310px)*0.3/2)] pb-[8px]">
                     <div className="pointer-events-auto w-full">

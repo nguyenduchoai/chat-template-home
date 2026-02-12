@@ -75,28 +75,28 @@ function SortableItem({ reason, onEdit, onDelete }: {
         <div
             ref={setNodeRef}
             style={style}
-            className="flex flex-col gap-4 p-4 bg-white border rounded-lg hover:shadow-md transition-shadow sm:flex-row sm:items-center"
+            className="flex flex-col gap-4 p-4 bg-card border rounded-lg hover:shadow-md transition-shadow sm:flex-row sm:items-center"
         >
             <div className="flex flex-1 gap-4">
                 <div
                     {...attributes}
                     {...listeners}
-                    className="cursor-grab active:cursor-grabbing text-gray-400 flex-shrink-0 pt-1"
+                    className="cursor-grab active:cursor-grabbing text-muted-foreground flex-shrink-0 pt-1"
                 >
                     <GripVertical className="h-5 w-5" />
                 </div>
                 <div className="flex gap-3 flex-1">
-                    <div className="inline-flex items-center justify-center rounded-lg bg-blue-50 text-blue-600 font-semibold text-xl px-4 py-2 min-w-[64px] max-w-[120px] whitespace-nowrap overflow-hidden text-ellipsis">
+                    <div className="inline-flex items-center justify-center rounded-lg bg-primary/10 text-primary font-semibold text-xl px-4 py-2 min-w-[64px] max-w-[120px] whitespace-nowrap overflow-hidden text-ellipsis">
                         {reason.icon}
                     </div>
                     <div className="space-y-1">
                         <div className="flex flex-wrap items-center gap-2">
                             <h3 className="font-semibold text-base">{reason.title}</h3>
                             {!reason.active && (
-                                <span className="text-xs bg-gray-100 px-2 py-1 rounded-full text-gray-600">Ẩn</span>
+                                <span className="text-xs bg-muted px-2 py-1 rounded-full text-muted-foreground">Ẩn</span>
                             )}
                         </div>
-                        <p className="text-sm text-gray-600">{reason.description}</p>
+                        <p className="text-sm text-muted-foreground">{reason.description}</p>
                     </div>
                 </div>
             </div>
@@ -108,7 +108,7 @@ function SortableItem({ reason, onEdit, onDelete }: {
                     variant="outline"
                     size="sm"
                     onClick={() => onDelete(reason.id)}
-                    className="text-red-600 hover:text-red-700"
+                    className="text-destructive hover:text-destructive hover:bg-destructive/10"
                 >
                     <Trash2 className="h-4 w-4" />
                 </Button>
@@ -119,16 +119,16 @@ function SortableItem({ reason, onEdit, onDelete }: {
 
 function ReasonSkeleton() {
     return (
-        <div className="p-4 border rounded-lg bg-white animate-pulse space-y-4">
+        <div className="p-4 border rounded-lg bg-card animate-pulse space-y-4">
             <div className="flex items-center gap-4">
-                <div className="h-5 w-5 bg-gray-200 rounded" />
-                <div className="h-12 w-12 rounded-lg bg-gray-200" />
+                <div className="h-5 w-5 bg-muted rounded" />
+                <div className="h-12 w-12 rounded-lg bg-muted" />
                 <div className="flex-1 space-y-2">
-                    <div className="h-4 bg-gray-200 rounded w-1/2" />
-                    <div className="h-3 bg-gray-100 rounded w-3/4" />
+                    <div className="h-4 bg-muted rounded w-1/2" />
+                    <div className="h-3 bg-muted rounded w-3/4" />
                 </div>
             </div>
-            <div className="h-3 bg-gray-100 rounded w-5/6" />
+            <div className="h-3 bg-muted rounded w-5/6" />
         </div>
     )
 }
@@ -364,7 +364,7 @@ export default function ReasonsPage() {
 
         if (!reasons.length) {
             return (
-                <div className="border rounded-lg bg-white p-10 text-center text-gray-500">
+                <div className="border rounded-lg bg-card p-10 text-center text-muted-foreground">
                     Chưa có lý do nào. Nhấn "Thêm mới" để bắt đầu.
                 </div>
             )
@@ -388,7 +388,7 @@ export default function ReasonsPage() {
             <div className="flex justify-between items-center mb-6">
                 <div>
                     <h1 className="text-2xl font-bold">Quản lý Lý do chọn</h1>
-                    <p className="text-sm text-gray-600 mt-1">Hiển thị số liệu và thống kê ấn tượng</p>
+                    <p className="text-sm text-muted-foreground mt-1">Hiển thị số liệu và thống kê ấn tượng</p>
                 </div>
                 <Button
                     onClick={() => {
@@ -401,11 +401,11 @@ export default function ReasonsPage() {
                 </Button>
             </div>
 
-            <div className="mb-6 rounded-xl border bg-white p-5 shadow-sm">
+            <div className="mb-6 rounded-xl border bg-card p-5 shadow-sm">
                 <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
                     <div>
-                        <p className="text-sm font-semibold text-gray-700 uppercase">Nội dung section số liệu</p>
-                        <p className="text-sm text-gray-500">Tiêu đề và mô tả xuất hiện trên trang chủ.</p>
+                        <p className="text-sm font-semibold text-muted-foreground uppercase">Nội dung section số liệu</p>
+                        <p className="text-sm text-muted-foreground">Tiêu đề và mô tả xuất hiện trên trang chủ.</p>
                     </div>
                     <Button type="button" onClick={handleSectionInfoSave} disabled={!siteInfo || isSectionSaving}>
                         {isSectionSaving ? 'Đang lưu...' : 'Lưu nội dung'}
@@ -450,11 +450,11 @@ export default function ReasonsPage() {
                         <div className="space-y-6">
                             {/* Icon/Number */}
                             <div className="space-y-2">
-                                <Label htmlFor="icon">Số liệu hoặc Icon <span className="text-red-500">*</span></Label>
+                                <Label htmlFor="icon">Số liệu hoặc Icon <span className="text-destructive">*</span></Label>
                                 <Input
                                     id="icon"
                                     placeholder="Ví dụ: 15K+ hoặc 98%"
-                                    className={`text-2xl font-bold ${errors.icon ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
+                                    className={`text-2xl font-bold ${errors.icon ? 'border-destructive focus-visible:ring-destructive' : ''}`}
                                     {...register('icon', {
                                         required: 'Số liệu hoặc icon là bắt buộc',
                                         minLength: {
@@ -464,20 +464,20 @@ export default function ReasonsPage() {
                                     })}
                                 />
                                 {errors.icon && (
-                                    <p className="text-sm text-red-500">{errors.icon.message}</p>
+                                    <p className="text-sm text-destructive">{errors.icon.message}</p>
                                 )}
-                                <p className="text-xs text-gray-500">
+                                <p className="text-xs text-muted-foreground">
                                     Nhập số liệu thống kê (VD: 15K+, 95%, 300+) hoặc emoji
                                 </p>
                             </div>
 
                             {/* Title */}
                             <div className="space-y-2">
-                                <Label htmlFor="title">Tiêu đề <span className="text-red-500">*</span></Label>
+                                <Label htmlFor="title">Tiêu đề <span className="text-destructive">*</span></Label>
                                 <Input
                                     id="title"
                                     placeholder="Ví dụ: Bệnh nhân đã tư vấn"
-                                    className={errors.title ? 'border-red-500 focus-visible:ring-red-500' : ''}
+                                    className={errors.title ? 'border-destructive focus-visible:ring-destructive' : ''}
                                     {...register('title', {
                                         required: 'Tiêu đề là bắt buộc',
                                         minLength: {
@@ -487,18 +487,18 @@ export default function ReasonsPage() {
                                     })}
                                 />
                                 {errors.title && (
-                                    <p className="text-sm text-red-500">{errors.title.message}</p>
+                                    <p className="text-sm text-destructive">{errors.title.message}</p>
                                 )}
                             </div>
 
                             {/* Description */}
                             <div className="space-y-2">
-                                <Label htmlFor="description">Mô tả <span className="text-red-500">*</span></Label>
+                                <Label htmlFor="description">Mô tả <span className="text-destructive">*</span></Label>
                                 <Textarea
                                     id="description"
                                     rows={4}
                                     placeholder="Mô tả chi tiết về số liệu này..."
-                                    className={errors.description ? 'border-red-500 focus-visible:ring-red-500' : ''}
+                                    className={errors.description ? 'border-destructive focus-visible:ring-destructive' : ''}
                                     {...register('description', {
                                         required: 'Mô tả là bắt buộc',
                                         minLength: {
@@ -507,16 +507,16 @@ export default function ReasonsPage() {
                                         },
                                     })}
                                 />
-                                <div className="flex justify-between text-xs text-gray-500">
+                                <div className="flex justify-between text-xs text-muted-foreground">
                                     <span>{descriptionValue?.length || 0} ký tự</span>
                                     {errors.description && (
-                                        <span className="text-red-500">{errors.description.message}</span>
+                                        <span className="text-destructive">{errors.description.message}</span>
                                     )}
                                 </div>
                             </div>
 
                             {/* Active Status */}
-                            <div className="flex items-center space-x-2 p-4 bg-gray-50 rounded-lg">
+                            <div className="flex items-center space-x-2 p-4 bg-muted/50 rounded-lg">
                                 <Controller
                                     name="active"
                                     control={control}
@@ -571,7 +571,7 @@ export default function ReasonsPage() {
                         <AlertDialogCancel>Hủy</AlertDialogCancel>
                         <AlertDialogAction
                             onClick={handleDelete}
-                            className="bg-red-500 hover:bg-red-600"
+                            className="bg-destructive hover:bg-destructive/90"
                         >
                             Xóa
                         </AlertDialogAction>

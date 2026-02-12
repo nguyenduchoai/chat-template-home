@@ -61,6 +61,7 @@ interface SettingsState {
     heroCta: string
     footerHotlineText: string
     footerChatHint: string
+    chatGreeting: string
     chatPageHint: string
     copyrightText: string
 }
@@ -110,6 +111,7 @@ const DEFAULT_SETTINGS: SettingsState = {
     heroCta: "",
     footerHotlineText: "",
     footerChatHint: "",
+    chatGreeting: "",
     chatPageHint: "",
     copyrightText: "",
 }
@@ -121,7 +123,7 @@ type StringSettingsKey = 'siteUrl' | 'title' | 'name' | 'logo' | 'description' |
     'address' | 'contact' | 'ogImage' | 'ogType' | 'twitterCard' |
     'homeTitleSize' | 'homeDescriptionSize' |
     'heroBgImage' | 'heroBgColor' | 'featuresBgImage' | 'featuresBgColor' | 'statsBgImage' | 'statsBgColor' |
-    'heroCta' | 'footerHotlineText' | 'footerChatHint' | 'chatPageHint' | 'copyrightText'
+    'heroCta' | 'footerHotlineText' | 'footerChatHint' | 'chatGreeting' | 'chatPageHint' | 'copyrightText'
 
 type BooleanSettingsKey = 'showSlides' | 'showBanner' | 'showFeatures' | 'showReasons' | 'showPosts' | 'chatEnabled'
 
@@ -181,7 +183,7 @@ export default function AdminSettingsPage() {
                     'chatAssistantId', 'chatApiUrl', 'chatApiKey', 'chatInputPlaceholder',
                     'homeTitleSize', 'homeDescriptionSize',
                     'heroBgImage', 'heroBgColor', 'featuresBgImage', 'featuresBgColor', 'statsBgImage', 'statsBgColor',
-                    'heroCta', 'footerHotlineText', 'footerChatHint', 'chatPageHint', 'copyrightText'
+                    'heroCta', 'footerHotlineText', 'footerChatHint', 'chatGreeting', 'chatPageHint', 'copyrightText'
                 ]
                 stringFields.forEach(key => {
                     next[key] = data?.[key] ?? ""
@@ -572,6 +574,11 @@ export default function AdminSettingsPage() {
                                 <InputDiv>
                                     <label className="text-sm font-medium">Gợi ý nhập chat (footer)</label>
                                     <Input value={settings.footerChatHint} onChange={handleChange("footerChatHint")} placeholder="Vui lòng nhập câu hỏi để được tư vấn" />
+                                </InputDiv>
+                                <InputDiv>
+                                    <label className="text-sm font-medium">Lời chào trang chat</label>
+                                    <Input value={settings.chatGreeting} onChange={handleChange("chatGreeting")} placeholder="Xin chào! Tôi có thể giúp gì cho bạn?" />
+                                    <p className="text-xs text-muted-foreground">Tiêu đề hiển thị ở trang chat khi chưa có cuộc trò chuyện</p>
                                 </InputDiv>
                                 <InputDiv>
                                     <label className="text-sm font-medium">Gợi ý trang chat</label>

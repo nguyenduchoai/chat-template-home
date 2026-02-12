@@ -6,9 +6,11 @@ import React, { useEffect, useState } from 'react'
 const DefaultChat = ({
     setPrompt,
     config,
+    chatGreeting,
 }: {
     setPrompt: (prompt: string) => void;
     config: any;
+    chatGreeting?: string;
 }) => {
     const [greeting, setGreeting] = useState<string[]>([]);
     useEffect(() => {
@@ -30,7 +32,7 @@ const DefaultChat = ({
             <div className="flex flex-col items-center gap-y-4">
                 <div className="gap-y-4 flex flex-col items-center  lg:max-w-full">
                     <p className="m-0 text-center text-[24px] font-[700] leading-[35.28px] text-white lg:text-[38px] lg:leading-[38px]">
-                        {config?.setting?.name && config?.setting?.name}
+                        {chatGreeting || config?.setting?.name}
                     </p>
                     {greeting.length > 0 && (
                         <TypeAnimation

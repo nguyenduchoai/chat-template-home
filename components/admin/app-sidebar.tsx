@@ -14,6 +14,8 @@ import {
   IconUserCircle,
   IconPalette,
   IconMail,
+  IconStar,
+  IconChartPie,
 } from "@tabler/icons-react"
 
 import { NavMain } from "@/components/admin/nav-main"
@@ -54,6 +56,16 @@ const data = {
       title: "Liên hệ",
       url: "/admin/contacts",
       icon: IconMail,
+    },
+    {
+      title: "Tính năng",
+      url: "/admin/features",
+      icon: IconStar,
+    },
+    {
+      title: "Số liệu",
+      url: "/admin/reasons",
+      icon: IconChartPie,
     },
   ],
   navSecondary: [

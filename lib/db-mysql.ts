@@ -96,6 +96,7 @@ export interface SiteInfo {
     heroCta?: string | null
     footerHotlineText?: string | null
     footerChatHint?: string | null
+    chatGreeting?: string | null
     chatPageHint?: string | null
     copyrightText?: string | null
     headerLinks?: string | null
