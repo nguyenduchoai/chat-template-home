@@ -68,7 +68,7 @@ export default function StatsSectionDental() {
                             transition={{ duration: 0.5, delay: index * 0.1 }}
                             className="dental-stat-card"
                         >
-                            <div className="dental-stat-card-inner p-5 md:p-6 text-center">
+                            <div className="dental-stat-card-inner p-5 md:p-6 text-center h-full flex flex-col justify-center">
                                 <div className="dental-stat-value text-3xl md:text-4xl lg:text-5xl font-extrabold mb-2">
                                     {reason.icon}
                                 </div>
